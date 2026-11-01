@@ -2,10 +2,10 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "mobile-web",
-      "runtimeExecutable": "bash",
-      "runtimeArgs": ["-c", "CI=1 npx expo start --web --port 8081"],
-      "port": 8081
+      "name": "trade-api",
+      "runtimeExecutable": "../trade_back/.venv/bin/python",
+      "runtimeArgs": ["-m", "uvicorn", "api.main:app", "--app-dir", "../trade_back", "--port", "8000"],
+      "port": 8000
     }
   ]
 }

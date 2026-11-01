@@ -1,0 +1,35 @@
+import '../../domain/entities/user.dart';
+
+class QuotaModel extends Quota {
+  const QuotaModel({required super.utilisees, required super.limite});
+
+  factory QuotaModel.fromJson(Map<String, dynamic> json) =>
+      QuotaModel(utilisees: json['used'] as int, limite: json['limit'] as int);
+}
+
+class UserModel extends User {
+  const UserModel({required super.id, required super.email, required super.plan, super.proJusquau, required super.assistant});
+
+  factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
+        id: json['id'] as int,
+        email: json['email'] as String,
+        plan: json['plan'] as String,
+        proJusquau: json['pro_until'] as String?,
+        assistant: QuotaModel.fromJson(json['assistant'] as Map<String, dynamic>),
+      );
+}
+
+/// Réponse de /auth/login et /auth/register : jetons + compte.
+class AuthResponseModel {
+  final String token;
+  final String refreshToken;
+  final UserModel user;
+
+  const AuthResponseModel({required this.token, required this.refreshToken, required this.user});
+
+  factory AuthResponseModel.fromJson(Map<String, dynamic> json) => AuthResponseModel(
+        token: json['token'] as String,
+        refreshToken: json['refresh_token'] as String,
+        user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
+      );
+}
