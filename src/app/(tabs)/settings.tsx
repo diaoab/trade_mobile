@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Alert, Platform, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 
+import { ChangePassword } from '@/components/change-password';
 import { ProOffer } from '@/components/pro-offer';
 import { DISCLAIMER, ErrorText, Footnote, GUTTER, Loading, Row, Screen, Section } from '@/components/ui';
 import { api, Preferences } from '@/lib/api';
@@ -121,6 +122,8 @@ export default function Settings() {
           </Section>
         </>
       )}
+
+      <ChangePassword />
 
       <Section title="Session">
         <Row onPress={signOut}>

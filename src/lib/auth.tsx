@@ -16,6 +16,7 @@ type AuthState = {
   user: User | null;
   signIn: (email: string, password: string, create: boolean) => Promise<void>;
   signOut: () => Promise<void>;
+  changePassword: (current: string, next: string) => Promise<void>;
   refreshUser: () => Promise<void>;
 };
 
@@ -73,8 +74,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(user);
   }, []);
 
+  // Le serveur ferme toutes les sessions et en rend une nouvelle pour cet appareil.
+  const changePassword = useCallback(async (current: string, next: string) => {
+    const session = await api<Session>('/auth/password', {
+      method: 'PUT',
+      body: { current_password: current, new_password: next },
+    });
+    setSession(session);
+    await writeSession(session);
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ ready, user, signIn, signOut, refreshUser }}>
+    <AuthContext.Provider value={{ ready, user, signIn, signOut, changePassword, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

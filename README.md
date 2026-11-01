@@ -11,7 +11,7 @@ navigateur. Elle consomme l'API du dossier `api/` du backend, dépôt voisin `..
    .venv/bin/python -m uvicorn api.main:app --port 8000
    ```
 
-   Un compte de démonstration se crée avec `.venv/bin/python -m api.dev_seed`.
+   Un compte de démonstration se crée avec `.venv/bin/python -m api.scripts.seed_dev`.
 
 2. Démarrer l'app, depuis ce dossier :
 
