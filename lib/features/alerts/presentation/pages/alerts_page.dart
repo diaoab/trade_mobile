@@ -10,6 +10,7 @@ import '../../../../core/widgets/app_section.dart';
 import '../../../../core/widgets/etats.dart';
 import '../../../../core/widgets/indicateurs.dart';
 import '../../domain/entities/alerte.dart';
+import '../../../auth/presentation/widgets/connexion_requise.dart';
 import '../bloc/alerts_bloc.dart';
 
 /// Ouvre l'écran des alertes avec le bloc de l'accueil (le compteur de la
@@ -153,7 +154,9 @@ class BoutonAlertes extends StatelessWidget {
       builder: (context, state) {
         final nonLues = state is AlertsLoaded ? state.alertes.nonLues : 0;
         return IconButton(
-          onPressed: () => ouvrirAlertes(context),
+          onPressed: () => estInvite(context)
+              ? demanderConnexion(context, raison: 'être prévenu quand le signal d’un de vos titres change')
+              : ouvrirAlertes(context),
           tooltip: nonLues == 0 ? 'Alertes' : 'Alertes, $nonLues non lues',
           icon: Badge(
             isLabelVisible: nonLues > 0,

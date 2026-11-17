@@ -1,6 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/errors/failure.dart';
+import '../../../../core/services/mode_session.dart';
 import '../../domain/usecases/get_current_user.dart';
 import '../../domain/usecases/login_user.dart';
 import '../../domain/usecases/logout_user.dart';
@@ -26,6 +27,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<SessionExpired>((event, emit) => emit(Unauthenticated(erreur: event.message ?? const SessionFailure().errorMessage)));
     on<UserRefreshRequested>(_onRefresh);
     on<UserUpdated>((event, emit) => emit(Authenticated(event.user)));
+    on<ContinuerSansCompte>((event, emit) => emit(Invite()));
+    on<ConnexionDemandee>((event, emit) => emit(Unauthenticated(creation: event.creation)));
+  }
+
+  @override
+  void onChange(Change<AuthState> change) {
+    super.onChange(change);
+    ModeSession.instance.invite = change.nextState is Invite;
   }
 
   Future<void> _onAppStarted(AppStarted event, Emitter<AuthState> emit) async {

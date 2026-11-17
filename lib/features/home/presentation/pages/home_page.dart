@@ -9,6 +9,9 @@ import '../../../account/presentation/bloc/account_bloc.dart';
 import '../../../alerts/presentation/bloc/alerts_bloc.dart';
 import '../../../account/presentation/bloc/account_event.dart';
 import '../../../account/presentation/pages/account_page.dart';
+import '../../../auth/presentation/widgets/connexion_requise.dart';
+import '../../../auth/presentation/widgets/compte_invite.dart';
+import '../../../../core/widgets/app_ecran.dart';
 import '../../../billing/presentation/bloc/billing_bloc.dart';
 import '../../../market/presentation/bloc/market_bloc.dart';
 import '../../../market/presentation/bloc/market_event.dart';
@@ -49,7 +52,12 @@ class _Onglets extends StatefulWidget {
 class _OngletsState extends State<_Onglets> {
   int _onglet = 0;
 
-  static const _pages = [MarketPage(), PortfolioPage(), AccountPage()];
+  late final bool _invite = estInvite(context);
+
+  /// En démo, Portefeuille et Compte invitent à créer un compte.
+  late final List<Widget> _pages = _invite
+      ? const [MarketPage(), _PortefeuilleInvite(), CompteInvite()]
+      : const [MarketPage(), PortfolioPage(), AccountPage()];
 
   @override
   void initState() {
@@ -66,6 +74,10 @@ class _OngletsState extends State<_Onglets> {
   }
 
   void _charger(int onglet) {
+    if (_invite) {
+      if (onglet == 0) context.read<MarketBloc>().add(LoadMarket());
+      return;
+    }
     switch (onglet) {
       case 0:
         context.read<MarketBloc>().add(LoadMarket());
@@ -104,4 +116,20 @@ class _OngletsState extends State<_Onglets> {
       ),
     );
   }
+}
+
+class _PortefeuilleInvite extends StatelessWidget {
+  const _PortefeuilleInvite();
+
+  @override
+  Widget build(BuildContext context) => const AppEcran(
+        titre: 'Portefeuille',
+        enfants: [
+          ConnexionRequise(
+            icone: Icons.pie_chart_outline,
+            titre: 'Suivez vos placements',
+            raison: 'enregistrer vos achats et suivre leur valeur, vos dividendes et votre résultat net de frais',
+          ),
+        ],
+      );
 }

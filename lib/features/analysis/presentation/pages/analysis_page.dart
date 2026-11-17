@@ -14,6 +14,7 @@ import '../../../../core/widgets/indicateurs.dart';
 import '../../../../injection_container.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
+import '../../../auth/presentation/widgets/connexion_requise.dart';
 import '../../../favorites/presentation/widgets/bouton_favori.dart';
 import '../../domain/entities/analysis.dart';
 import '../bloc/analysis_bloc.dart';
@@ -171,8 +172,51 @@ class AnalysisPage extends StatelessWidget {
           ],
         ),
       SimulateurSection(analyse: a),
-      const AssistantSection(),
+      if (estInvite(context))
+        const AppSection(
+          titre: 'Assistant',
+          enfants: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: AppEspace.gouttiere),
+              child: _AssistantInvite(),
+            ),
+          ],
+        )
+      else
+        const AssistantSection(),
       const NotePied(kAvertissement),
     ];
+  }
+}
+
+/// Assistant réservé aux comptes : le visiteur en démo est invité à en créer un.
+class _AssistantInvite extends StatelessWidget {
+  const _AssistantInvite();
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.couleurs;
+    return Material(
+      color: c.surface,
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () => demanderConnexion(context, raison: 'poser vos questions à l’assistant sur cette analyse'),
+        child: Padding(
+          padding: const EdgeInsets.all(AppEspace.l),
+          child: Row(
+            children: [
+              Icon(Icons.lock_outline, color: c.texteMoyen),
+              const SizedBox(width: AppEspace.m),
+              Expanded(
+                child: Text('Posez vos questions sur cette analyse avec un compte gratuit.',
+                    style: AppTypo.style(taille: 15, couleur: c.texte, hauteur: 1.4)),
+              ),
+              Icon(Icons.chevron_right, color: c.texteFaible),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

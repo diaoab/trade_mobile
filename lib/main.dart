@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp> {
             listenWhen: (avant, apres) => avant.runtimeType != apres.runtimeType && apres is! AuthLoading,
             listener: (context, state) {
               di.sl<FavoritesBloc>().add(state is Authenticated ? LoadFavoris() : ViderFavoris());
-              final route = state is Authenticated ? AppRouter.homeRoute : AppRouter.loginRoute;
+              final route = state is Authenticated || state is Invite ? AppRouter.homeRoute : AppRouter.loginRoute;
               _navigatorKey.currentState?.pushNamedAndRemoveUntil(route, (_) => false);
             },
             child: MediaQuery(

@@ -13,6 +13,7 @@ import '../../../../core/widgets/bandeau_cours_anciens.dart';
 import '../../../../core/widgets/etats.dart';
 import '../../../../core/widgets/indicateurs.dart';
 import '../../../alerts/presentation/bloc/alerts_bloc.dart';
+import '../../../auth/presentation/widgets/connexion_requise.dart';
 import '../../../favorites/presentation/bloc/favorites_bloc.dart';
 import '../../../alerts/presentation/pages/alerts_page.dart';
 import '../../../portfolio/presentation/bloc/portfolio_bloc.dart';
@@ -40,8 +41,10 @@ class MarketPage extends StatelessWidget {
           action: const BoutonAlertes(),
           sousTitre: derniere == null ? 'BRVM' : 'BRVM · séance du ${Format.date(derniere)}',
           onActualiser: () async {
-            context.read<PortfolioBloc>().add(LoadPortfolio());
-            context.read<AlertsBloc>().add(LoadAlertes());
+            if (!estInvite(context)) {
+              context.read<PortfolioBloc>().add(LoadPortfolio());
+              context.read<AlertsBloc>().add(LoadAlertes());
+            }
             bloc.add(LoadMarket());
             await bloc.stream.firstWhere((s) => s is! MarketLoading);
           },
@@ -49,6 +52,7 @@ class MarketPage extends StatelessWidget {
             if (state is MarketError) MessageErreur(state.message),
             if (state is MarketLoading || state is MarketInitial) const Chargement(),
             if (state is MarketLoaded) ...[
+              if (estInvite(context)) const BandeauDemo(),
               BandeauCoursAnciens(date: derniere),
               if (state.titres.isNotEmpty)
                 BlocBuilder<PortfolioBloc, PortfolioState>(

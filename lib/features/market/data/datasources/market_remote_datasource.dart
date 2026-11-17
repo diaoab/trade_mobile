@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/config/env.dart';
 import '../../../../core/network/api_call.dart';
+import '../../../../core/services/mode_session.dart';
 import '../models/market_entry_model.dart';
 
 abstract class MarketRemoteDataSource {
@@ -19,7 +20,8 @@ class MarketRemoteDataSourceImpl implements MarketRemoteDataSource {
       donnees<List<dynamic>>(r).map((e) => MarketEntryModel.fromJson(e as Map<String, dynamic>)).toList();
 
   @override
-  Future<List<MarketEntryModel>> getMarket() async => _liste(await dio.get(Env.market));
+  Future<List<MarketEntryModel>> getMarket() async =>
+      _liste(await dio.get(ModeSession.instance.invite ? Env.demoMarket : Env.market));
 
   @override
   Future<List<MarketEntryModel>> getStructures() async => _liste(await dio.get(Env.structures));

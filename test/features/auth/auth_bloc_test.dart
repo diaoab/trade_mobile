@@ -1,6 +1,7 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:dartz/dartz.dart';
 import 'package:financial_ai_advisor/core/errors/failure.dart';
+import 'package:financial_ai_advisor/core/services/mode_session.dart';
 import 'package:financial_ai_advisor/features/auth/domain/entities/user.dart';
 import 'package:financial_ai_advisor/features/auth/domain/repositories/auth_repository.dart';
 import 'package:financial_ai_advisor/features/auth/domain/usecases/get_current_user.dart';
@@ -87,5 +88,22 @@ void main() {
     seed: () => Authenticated(_user),
     act: (b) => b.add(UserRefreshRequested()),
     expect: () => <AuthState>[],
+  );
+
+  blocTest<AuthBloc, AuthState>(
+    '« Découvrir sans compte » passe en démo : le marché lit les routes /demo',
+    build: bloc,
+    act: (b) => b.add(ContinuerSansCompte()),
+    expect: () => [isA<Invite>()],
+    verify: (_) => expect(ModeSession.instance.invite, isTrue),
+  );
+
+  blocTest<AuthBloc, AuthState>(
+    'depuis la démo, « Créer un compte » ouvre la création de compte et quitte la démo',
+    build: bloc,
+    seed: () => Invite(),
+    act: (b) => b.add(ConnexionDemandee(creation: true)),
+    expect: () => [isA<Unauthenticated>().having((s) => s.creation, 'creation', true).having((s) => s.erreur, 'erreur', null)],
+    verify: (_) => expect(ModeSession.instance.invite, isFalse),
   );
 }

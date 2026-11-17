@@ -16,6 +16,15 @@ class LoginRequested extends AuthEvent {
 
 class LogoutRequested extends AuthEvent {}
 
+/// « Continuer sans compte » : mode démo.
+class ContinuerSansCompte extends AuthEvent {}
+
+/// Visiteur qui veut se connecter ou créer un compte ([creation]).
+class ConnexionDemandee extends AuthEvent {
+  final bool creation;
+  ConnexionDemandee({this.creation = false});
+}
+
 /// Session refusée par l'API (jeton de rafraîchissement expiré ou révoqué,
 /// compte désactivé). [message] : explication de l'API, s'il y en a une.
 class SessionExpired extends AuthEvent {

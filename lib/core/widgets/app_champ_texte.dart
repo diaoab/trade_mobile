@@ -4,8 +4,9 @@ import '../theme/app_color.dart';
 import '../theme/app_dimensions.dart';
 import '../theme/app_typo.dart';
 
-/// Champ de saisie avec son libellé au-dessus.
-class AppChampTexte extends StatelessWidget {
+/// Champ de saisie avec son libellé au-dessus. Un champ [motDePasse] a un
+/// œil pour afficher ou masquer ce qui est tapé.
+class AppChampTexte extends StatefulWidget {
   final String libelle;
   final TextEditingController controller;
   final String? indication;
@@ -14,6 +15,9 @@ class AppChampTexte extends StatelessWidget {
   final Iterable<String>? autofill;
   final ValueChanged<String>? onSubmitted;
   final ValueChanged<String>? onChanged;
+
+  /// Icône à gauche du champ (enveloppe, cadenas…).
+  final IconData? icone;
 
   const AppChampTexte({
     super.key,
@@ -25,33 +29,51 @@ class AppChampTexte extends StatelessWidget {
     this.autofill,
     this.onSubmitted,
     this.onChanged,
+    this.icone,
   });
+
+  @override
+  State<AppChampTexte> createState() => _AppChampTexteState();
+}
+
+class _AppChampTexteState extends State<AppChampTexte> {
+  bool _visible = false;
 
   @override
   Widget build(BuildContext context) {
     final c = context.couleurs;
+    final motDePasse = widget.motDePasse;
+    final masque = motDePasse && !_visible;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(libelle, style: AppTypo.style(taille: 13, graisse: FontWeight.w500, couleur: c.texteMoyen)),
+        Text(widget.libelle, style: AppTypo.style(taille: 13, graisse: FontWeight.w500, couleur: c.texteMoyen)),
         const SizedBox(height: AppEspace.s),
         TextField(
-          controller: controller,
-          obscureText: motDePasse,
-          keyboardType: clavier,
-          autofillHints: autofill,
-          autocorrect: !motDePasse && clavier != TextInputType.emailAddress,
+          controller: widget.controller,
+          obscureText: masque,
+          keyboardType: widget.clavier,
+          autofillHints: widget.autofill,
+          autocorrect: !motDePasse && widget.clavier != TextInputType.emailAddress,
           enableSuggestions: !motDePasse,
           textCapitalization: TextCapitalization.none,
-          onSubmitted: onSubmitted,
-          onChanged: onChanged,
+          onSubmitted: widget.onSubmitted,
+          onChanged: widget.onChanged,
           style: AppTypo.style(taille: 17, couleur: c.texte),
           decoration: InputDecoration(
-            hintText: indication,
+            hintText: widget.indication,
             hintStyle: AppTypo.style(taille: 17, couleur: c.texteFaible),
             filled: true,
             fillColor: c.surface,
             contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            prefixIcon: widget.icone == null ? null : Icon(widget.icone, size: 20, color: c.texteMoyen),
+            suffixIcon: motDePasse
+                ? IconButton(
+                    onPressed: () => setState(() => _visible = !_visible),
+                    tooltip: _visible ? 'Masquer le mot de passe' : 'Afficher le mot de passe',
+                    icon: Icon(_visible ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: c.texteMoyen),
+                  )
+                : null,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRayon.m), borderSide: BorderSide.none),
           ),
         ),

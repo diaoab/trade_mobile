@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_color.dart';
+import '../../../auth/presentation/widgets/connexion_requise.dart';
 import '../bloc/favorites_bloc.dart';
 
 /// Étoile pour suivre un titre (écran Analyse).
@@ -18,7 +19,9 @@ class BoutonFavori extends StatelessWidget {
       builder: (context, state) {
         final suivi = state.contient(symbol);
         return IconButton(
-          onPressed: () => context.read<FavoritesBloc>().add(BasculerFavori(symbol)),
+          onPressed: () => estInvite(context)
+              ? demanderConnexion(context, raison: 'suivre $nom en favori et recevoir ses alertes')
+              : context.read<FavoritesBloc>().add(BasculerFavori(symbol)),
           tooltip: suivi ? 'Retirer $nom des favoris' : 'Ajouter $nom aux favoris',
           icon: Icon(suivi ? Icons.star_rounded : Icons.star_outline_rounded,
               color: suivi ? c.prudence : c.texte, size: 28),

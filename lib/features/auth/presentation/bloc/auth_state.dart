@@ -13,5 +13,11 @@ class Authenticated extends AuthState {
 
 class Unauthenticated extends AuthState {
   final String? erreur;
-  Unauthenticated({this.erreur});
+
+  /// Ouvrir la page sur la création de compte plutôt que la connexion.
+  final bool creation;
+  Unauthenticated({this.erreur, this.creation = false});
 }
+
+/// Visiteur sans compte : démo du Marché et de l'Analyse, en lecture seule.
+class Invite extends AuthState {}

@@ -6,6 +6,7 @@ import '../../../../core/config/env.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/network/api_call.dart';
 import '../../../../core/network/sse.dart';
+import '../../../../core/services/mode_session.dart';
 import '../../../auth/data/models/user_model.dart';
 import '../../domain/entities/analysis.dart';
 import '../models/analysis_model.dart';
@@ -23,7 +24,8 @@ class AnalysisRemoteDataSourceImpl implements AnalysisRemoteDataSource {
 
   @override
   Future<AnalysisModel> getAnalysis(String symbol) async =>
-      AnalysisModel.fromJson(donnees(await dio.get(Env.analyse(symbol))));
+      AnalysisModel.fromJson(donnees(
+          await dio.get(ModeSession.instance.invite ? Env.demoAnalyse(symbol) : Env.analyse(symbol))));
 
   /// L'API répond en Server-Sent Events :
   ///   delta {"text"}       morceau de la réponse (autant que nécessaire)
