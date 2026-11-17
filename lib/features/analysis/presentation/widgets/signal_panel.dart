@@ -105,6 +105,11 @@ class SignalPanel extends StatelessWidget {
               ],
             );
           }),
+          if (resultat.scoreSeance != null)
+            Padding(
+              padding: const EdgeInsets.only(top: AppEspace.s),
+              child: Text(_explicationLissage(resultat), style: AppTypo.style(taille: 13, couleur: c.texteMoyen, hauteur: 1.4)),
+            ),
           Container(
             margin: const EdgeInsets.only(top: AppEspace.l),
             padding: const EdgeInsets.only(top: 14),
@@ -129,4 +134,15 @@ class SignalPanel extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Le signal repose sur le score lissé : un écart d'une seule séance ne le
+/// fait pas basculer. Explique l'écart avec le score brut du jour.
+String _explicationLissage(ResultatDecision r) {
+  final duJour = Format.nombre(r.scoreSeance);
+  final signalDuJour = Signal.depuis(r.decisionSeance);
+  final base = 'Score lissé sur les dernières séances (séance du jour : $duJour/100).';
+  if (signalDuJour == null || r.decisionSeance == r.decision) return base;
+  return '$base À elle seule, la séance indiquerait « ${signalDuJour.libelle} » : '
+      'le signal attend que la tendance se confirme avant de changer.';
 }

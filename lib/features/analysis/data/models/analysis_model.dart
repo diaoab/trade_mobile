@@ -12,6 +12,7 @@ class AnalysisModel extends Analysis {
     required super.prediction,
     super.dividende,
     required super.graphique,
+    super.fraisAllerRetour,
   });
 
   static Ton _ton(Object? valeur) => switch (valeur) {
@@ -33,6 +34,8 @@ class AnalysisModel extends Analysis {
       resultat: ResultatDecision(
         decision: r['decision'] as String? ?? '',
         score: nombreOuNull(r['score']) ?? 0,
+        scoreSeance: nombreOuNull(r['session_score']),
+        decisionSeance: r['session_decision'] as String?,
         confiance: nombreOuNull(r['confidence']) ?? 0,
         scoreTechnique: nombreOuNull(r['technical_score']) ?? 0,
         scoreRisque: nombreOuNull(r['risk_score']),
@@ -56,6 +59,7 @@ class AnalysisModel extends Analysis {
         horizonJours: ml['horizon_days'] as int?,
       ),
       dividende: DividendeModel.fromJson(json['dividend']),
+      fraisAllerRetour: nombreOuNull(json['round_trip_fee']),
       graphique: SeriesGraphique(
         dates: (chart['dates'] as List? ?? const []).cast<String>(),
         series: {

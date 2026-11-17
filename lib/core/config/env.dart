@@ -45,6 +45,10 @@ class Env {
 
   // ─── Marché ────────────────────────────────────────────────────────────
   static const String market = '/market';
+  static const String alertes = '/alerts';
+  static const String favoris = '/account/favorites';
+  static String favori(String symbol) => '/account/favorites/$symbol';
+  static const String alertesLues = '/alerts/seen';
   static const String structures = '/structures';
   static String analyse(String symbol) => '/structures/$symbol/analysis';
   /// Réponse de l'assistant en Server-Sent Events (texte affiché pendant qu'il s'écrit).

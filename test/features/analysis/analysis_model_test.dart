@@ -13,6 +13,8 @@ void main() {
       'result': {
         'decision': 'CONSERVER',
         'score': 52.4,
+        'session_score': 40,
+        'session_decision': 'VENDRE',
         'confidence': 61,
         'technical_score': 55,
         'ml_score': null,
@@ -42,6 +44,8 @@ void main() {
     expect(a.resultat.details.first.ton, Ton.negatif);
     expect(a.resultat.details.last.compte, isFalse);
     expect(a.resultat.alertesLiquidite, ['Volume faible']);
+    expect(a.resultat.scoreSeance, 40);
+    expect(a.resultat.decisionSeance, 'VENDRE');
     expect(a.prediction.horizonJours, 60);
     expect(a.dividende!.joursRestants, 9);
     expect(a.graphique['MM20'], [null, 7550.5]);

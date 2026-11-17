@@ -9,6 +9,7 @@ import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
 import 'features/auth/presentation/bloc/auth_event.dart';
 import 'features/auth/presentation/bloc/auth_state.dart';
+import 'features/favorites/presentation/bloc/favorites_bloc.dart';
 import 'injection_container.dart' as di;
 
 void main() async {
@@ -37,8 +38,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: di.sl<AuthBloc>()..add(AppStarted()),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: di.sl<AuthBloc>()..add(AppStarted())),
+        BlocProvider.value(value: di.sl<FavoritesBloc>()),
+      ],
       child: MaterialApp(
         navigatorKey: _navigatorKey,
         debugShowCheckedModeBanner: false,
@@ -58,6 +62,7 @@ class _MyAppState extends State<MyApp> {
           return BlocListener<AuthBloc, AuthState>(
             listenWhen: (avant, apres) => avant.runtimeType != apres.runtimeType && apres is! AuthLoading,
             listener: (context, state) {
+              di.sl<FavoritesBloc>().add(state is Authenticated ? LoadFavoris() : ViderFavoris());
               final route = state is Authenticated ? AppRouter.homeRoute : AppRouter.loginRoute;
               _navigatorKey.currentState?.pushNamedAndRemoveUntil(route, (_) => false);
             },

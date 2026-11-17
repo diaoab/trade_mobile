@@ -14,6 +14,7 @@ import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../billing/presentation/widgets/pro_offer.dart';
+import '../../../onboarding/presentation/pages/prise_en_main_page.dart';
 import '../../domain/entities/preferences.dart';
 import '../bloc/account_bloc.dart';
 import '../bloc/account_event.dart';
@@ -54,6 +55,19 @@ class AccountPage extends StatelessWidget {
             if (user != null) ProfileSection(user: user),
             if (prefs != null) ..._reglages(context, prefs),
             const ChangePasswordSection(),
+            AppSection(
+              titre: 'Aide',
+              enfants: [
+                AppLigne(
+                  derniere: true,
+                  onTap: () => ouvrirPriseEnMain(context),
+                  enfants: [
+                    Expanded(child: Text('Comment lire les signaux', style: AppTypo.style(taille: 16, couleur: context.couleurs.texte))),
+                    Icon(Icons.chevron_right, size: 20, color: context.couleurs.texteFaible),
+                  ],
+                ),
+              ],
+            ),
             AppSection(
               titre: 'Session',
               enfants: [

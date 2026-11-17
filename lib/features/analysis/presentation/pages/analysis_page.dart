@@ -8,11 +8,13 @@ import '../../../../core/theme/app_typo.dart';
 import '../../../../core/utils/format.dart';
 import '../../../../core/widgets/app_ecran.dart';
 import '../../../../core/widgets/app_section.dart';
+import '../../../../core/widgets/bandeau_cours_anciens.dart';
 import '../../../../core/widgets/etats.dart';
 import '../../../../core/widgets/indicateurs.dart';
 import '../../../../injection_container.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
+import '../../../favorites/presentation/widgets/bouton_favori.dart';
 import '../../domain/entities/analysis.dart';
 import '../bloc/analysis_bloc.dart';
 import '../bloc/assistant_bloc.dart';
@@ -20,6 +22,7 @@ import '../widgets/assistant_section.dart';
 import '../widgets/indicator_row.dart';
 import '../widgets/price_chart.dart';
 import '../widgets/signal_panel.dart';
+import '../widgets/simulateur_section.dart';
 
 /// Analyse détaillée d'un titre. Ses blocs vivent le temps de l'écran.
 class AnalysisPage extends StatelessWidget {
@@ -41,7 +44,10 @@ class AnalysisPage extends StatelessWidget {
         ),
       ],
       child: Scaffold(
-        appBar: AppBar(toolbarHeight: 44),
+        appBar: AppBar(
+          toolbarHeight: 44,
+          actions: [BoutonFavori(symbol: symbol, nom: symbol.replaceAll('_', ' ')), const SizedBox(width: 8)],
+        ),
         body: BlocBuilder<AnalysisBloc, AnalysisState>(
           builder: (context, state) => AppEcran(
             onActualiser: () async {
@@ -94,6 +100,7 @@ class AnalysisPage extends StatelessWidget {
           ],
         ),
       ),
+      BandeauCoursAnciens(date: a.seance, portee: 'Le cours, le graphique et le signal'),
       const SizedBox(height: 20),
       PriceChart(graphique: a.graphique),
       const SizedBox(height: 28),
@@ -163,6 +170,7 @@ class AnalysisPage extends StatelessWidget {
             ]),
           ],
         ),
+      SimulateurSection(analyse: a),
       const AssistantSection(),
       const NotePied(kAvertissement),
     ];

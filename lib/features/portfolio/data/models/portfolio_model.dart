@@ -20,6 +20,8 @@ class PortfolioModel extends Portfolio {
             quantite: _n(p['quantity']),
             prixAchat: _n(p['buy_price']),
             dateAchat: p['buy_date'] as String,
+            dateCours: p['last_date'] as String?,
+            enAttenteCours: p['awaiting_quote'] == true,
             valorisation: p['valuation'] is Map<String, dynamic> ? _valorisation(p['valuation'] as Map<String, dynamic>) : null,
           ),
       ],
@@ -30,6 +32,8 @@ class PortfolioModel extends Portfolio {
         frais: _n(t['fees']),
         net: _n(t['net']),
         netPct: nombreOuNull(t['net_pct']),
+        dateCours: t['as_of'] as String?,
+        enAttenteCours: (t['awaiting_quote'] as int?) ?? 0,
       ),
     );
   }

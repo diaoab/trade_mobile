@@ -9,6 +9,7 @@ import '../../../../core/utils/format.dart';
 import '../../../../core/widgets/app_bouton.dart';
 import '../../../../core/widgets/app_ecran.dart';
 import '../../../../core/widgets/app_section.dart';
+import '../../../../core/widgets/bandeau_cours_anciens.dart';
 import '../../../../core/widgets/etats.dart';
 import '../../../../core/widgets/indicateurs.dart';
 import '../../domain/entities/portfolio.dart';
@@ -48,7 +49,11 @@ class _PortfolioPageState extends State<PortfolioPage> {
             if (state is PortfolioError) MessageErreur(state.message),
             if (state is PortfolioLoading || state is PortfolioInitial) const Chargement(),
             if (state is PortfolioLoaded && _edition) MessageErreur(state.erreurAction),
-            if (portfolio != null && aDesPositions) ..._synthese(context, portfolio),
+            if (portfolio != null && aDesPositions) ...[
+              BandeauCoursAnciens(date: portfolio.totaux.dateCours, portee: 'La valorisation et le résultat'),
+              if (portfolio.positions.any((p) => p.valorisation != null)) ..._synthese(context, portfolio),
+              _NoteAttenteCours(portfolio: portfolio),
+            ],
             if (portfolio != null && !aDesPositions)
               const EtatVide(
                 icone: Icons.pie_chart_outline,
@@ -109,6 +114,11 @@ class _PortfolioPageState extends State<PortfolioPage> {
               ]),
               style: AppTypo.style(taille: 15, graisse: FontWeight.w600, couleur: c.variation(t.net), tabulaire: true),
             ),
+            if (t.dateCours != null) ...[
+              const SizedBox(height: 4),
+              Text('Valorisé au cours du ${Format.date(t.dateCours)}',
+                  style: AppTypo.style(taille: 13, couleur: c.texteMoyen)),
+            ],
           ],
         ),
       ),
@@ -168,8 +178,43 @@ class _LignePosition extends StatelessWidget {
               const SizedBox(height: 4),
               ChangePill(valeur: v.netPct),
             ],
+          )
+        else if (position.enAttenteCours)
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(Format.nombre(position.quantite * position.prixAchat),
+                  style: AppTypo.style(taille: 17, graisse: FontWeight.w600, couleur: c.texte, tabulaire: true)),
+              const SizedBox(height: 4),
+              Text('En attente de cours', style: AppTypo.style(taille: 13, graisse: FontWeight.w500, couleur: c.prudence)),
+            ],
           ),
       ],
+    );
+  }
+}
+
+/// Explique pourquoi des positions ne sont pas valorisées : elles ont été
+/// achetées après la dernière séance connue de l'app.
+class _NoteAttenteCours extends StatelessWidget {
+  final Portfolio portfolio;
+  const _NoteAttenteCours({required this.portfolio});
+
+  @override
+  Widget build(BuildContext context) {
+    final enAttente = portfolio.positions.where((p) => p.enAttenteCours).toList();
+    if (enAttente.isEmpty) return const SizedBox.shrink();
+    final dateCours = enAttente.first.dateCours;
+    final texte = enAttente.length == 1
+        ? '${enAttente.first.nom} a été acheté après la dernière séance connue (${Format.date(dateCours)}). '
+            'Sa valeur et son résultat s’afficheront dès que les cours seront mis à jour ; '
+            'il n’est pas compté dans le total.'
+        : '${enAttente.length} positions ont été achetées après la dernière séance connue '
+            '(${Format.date(dateCours)}). Leur valeur et leur résultat s’afficheront dès que les cours '
+            'seront mis à jour ; elles ne sont pas comptées dans le total.';
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(AppEspace.gouttiere, AppEspace.m, AppEspace.gouttiere, 0),
+      child: TexteDiscret(texte),
     );
   }
 }

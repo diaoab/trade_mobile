@@ -9,12 +9,21 @@ import '../../../../core/theme/app_typo.dart';
 import '../../../../core/utils/format.dart';
 import '../../../../core/widgets/app_ecran.dart';
 import '../../../../core/widgets/app_section.dart';
+import '../../../../core/widgets/bandeau_cours_anciens.dart';
 import '../../../../core/widgets/etats.dart';
 import '../../../../core/widgets/indicateurs.dart';
+import '../../../alerts/presentation/bloc/alerts_bloc.dart';
+import '../../../favorites/presentation/bloc/favorites_bloc.dart';
+import '../../../alerts/presentation/pages/alerts_page.dart';
+import '../../../portfolio/presentation/bloc/portfolio_bloc.dart';
+import '../../../portfolio/presentation/bloc/portfolio_event.dart';
+import '../../../portfolio/presentation/bloc/portfolio_state.dart';
 import '../../domain/entities/market_entry.dart';
+import '../../domain/entities/resume_du_jour.dart';
 import '../bloc/market_bloc.dart';
 import '../bloc/market_event.dart';
 import '../bloc/market_state.dart';
+import '../widgets/resume_du_jour_carte.dart';
 import '../widgets/sparkline.dart';
 
 class MarketPage extends StatelessWidget {
@@ -28,8 +37,11 @@ class MarketPage extends StatelessWidget {
         final derniere = state is MarketLoaded ? state.derniereSeance : null;
         return AppEcran(
           titre: 'Marché',
+          action: const BoutonAlertes(),
           sousTitre: derniere == null ? 'BRVM' : 'BRVM · séance du ${Format.date(derniere)}',
           onActualiser: () async {
+            context.read<PortfolioBloc>().add(LoadPortfolio());
+            context.read<AlertsBloc>().add(LoadAlertes());
             bloc.add(LoadMarket());
             await bloc.stream.firstWhere((s) => s is! MarketLoading);
           },
@@ -37,18 +49,20 @@ class MarketPage extends StatelessWidget {
             if (state is MarketError) MessageErreur(state.message),
             if (state is MarketLoading || state is MarketInitial) const Chargement(),
             if (state is MarketLoaded) ...[
-              if (state.titres.isNotEmpty) _Repartition(titres: state.titres),
-              AppSection(
-                titre: 'Titres suivis',
-                enfants: [
-                  if (state.titres.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: AppEspace.gouttiere),
-                      child: TexteDiscret('Aucun titre disponible.'),
+              BandeauCoursAnciens(date: derniere),
+              if (state.titres.isNotEmpty)
+                BlocBuilder<PortfolioBloc, PortfolioState>(
+                  builder: (context, portefeuille) => ResumeDuJourCarte(
+                    seance: derniere,
+                    resume: ResumeDuJour.calculer(
+                      state.titres,
+                      portfolio: portefeuille is PortfolioLoaded ? portefeuille.portfolio : null,
                     ),
-                  for (var i = 0; i < state.titres.length; i++)
-                    _LigneTitre(titre: state.titres[i], derniere: i == state.titres.length - 1),
-                ],
+                  ),
+                ),
+              if (state.titres.isNotEmpty) _Repartition(titres: state.titres),
+              BlocBuilder<FavoritesBloc, FavoritesState>(
+                builder: (context, favoris) => _ListesTitres(titres: state.titres, favoris: favoris.symboles),
               ),
               if (state.titres.any((t) => t.changements.isNotEmpty)) _Changements(titres: state.titres),
             ],
@@ -110,10 +124,63 @@ class _Repartition extends StatelessWidget {
   }
 }
 
+/// Favoris en tête (dans l'ordre d'ajout), puis les autres titres. Sans
+/// favori, une seule liste et une indication pour en ajouter.
+class _ListesTitres extends StatelessWidget {
+  final List<MarketEntry> titres;
+  final List<String> favoris;
+  const _ListesTitres({required this.titres, required this.favoris});
+
+  @override
+  Widget build(BuildContext context) {
+    final parSymbole = {for (final t in titres) t.symbol: t};
+    final suivis = [for (final s in favoris) ?parSymbole[s]];
+    final autres = titres.where((t) => !favoris.contains(t.symbol)).toList();
+
+    List<Widget> lignes(List<MarketEntry> liste, {bool favori = false}) => [
+          for (var i = 0; i < liste.length; i++)
+            _LigneTitre(titre: liste[i], derniere: i == liste.length - 1, favori: favori),
+        ];
+
+    if (titres.isEmpty) {
+      return const AppSection(
+        titre: 'Titres',
+        enfants: [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: AppEspace.gouttiere),
+            child: TexteDiscret('Aucun titre disponible.'),
+          ),
+        ],
+      );
+    }
+    if (suivis.isEmpty) {
+      return AppSection(
+        titre: 'Titres',
+        enfants: [
+          ...lignes(autres),
+          const Padding(
+            padding: EdgeInsets.fromLTRB(AppEspace.gouttiere, AppEspace.m, AppEspace.gouttiere, 0),
+            child: TexteDiscret('Ouvrez un titre et touchez l’étoile pour le suivre : '
+                'il passera en tête de liste et vous recevrez ses alertes.'),
+          ),
+        ],
+      );
+    }
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        AppSection(titre: 'Mes favoris', enfants: lignes(suivis, favori: true)),
+        if (autres.isNotEmpty) AppSection(titre: 'Autres titres', enfants: lignes(autres)),
+      ],
+    );
+  }
+}
+
 class _LigneTitre extends StatelessWidget {
   final MarketEntry titre;
   final bool derniere;
-  const _LigneTitre({required this.titre, required this.derniere});
+  final bool favori;
+  const _LigneTitre({required this.titre, required this.derniere, this.favori = false});
 
   @override
   Widget build(BuildContext context) {
@@ -127,10 +194,20 @@ class _LigneTitre extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(titre.nom,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypo.style(taille: 17, graisse: FontWeight.w600, couleur: c.texte, interlettre: -0.2)),
+              Row(
+                children: [
+                  if (favori) ...[
+                    Icon(Icons.star_rounded, size: 16, color: c.prudence, semanticLabel: 'Favori'),
+                    const SizedBox(width: 4),
+                  ],
+                  Flexible(
+                    child: Text(titre.nom,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypo.style(taille: 17, graisse: FontWeight.w600, couleur: c.texte, interlettre: -0.2)),
+                  ),
+                ],
+              ),
               const SizedBox(height: 4),
               Wrap(
                 spacing: 10,

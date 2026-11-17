@@ -48,6 +48,19 @@ import 'features/billing/domain/usecases/get_offre.dart';
 import 'features/billing/domain/usecases/start_checkout.dart';
 import 'features/billing/presentation/bloc/billing_bloc.dart';
 
+import 'features/onboarding/data/prise_en_main_service.dart';
+// Favoris
+import 'features/favorites/data/datasources/favorites_remote_datasource.dart';
+import 'features/favorites/data/repositories/favorites_repository_impl.dart';
+import 'features/favorites/domain/repositories/favorites_repository.dart';
+import 'features/favorites/domain/usecases/favorites_usecases.dart';
+import 'features/favorites/presentation/bloc/favorites_bloc.dart';
+// Alertes
+import 'features/alerts/data/datasources/alerts_remote_datasource.dart';
+import 'features/alerts/data/repositories/alerts_repository_impl.dart';
+import 'features/alerts/domain/repositories/alerts_repository.dart';
+import 'features/alerts/domain/usecases/alerts_usecases.dart';
+import 'features/alerts/presentation/bloc/alerts_bloc.dart';
 // Market
 import 'features/market/data/datasources/market_remote_datasource.dart';
 import 'features/market/data/repositories/market_repository_impl.dart';
@@ -74,6 +87,7 @@ Future<void> init() async {
 
   sl.registerLazySingleton(() => const FlutterSecureStorage());
   sl.registerLazySingleton(() => TokenService(secureStorage: sl()));
+  sl.registerLazySingleton(() => PriseEnMainService(secureStorage: sl()));
   sl.registerLazySingleton(() => EtagInterceptor());
 
   sl.registerLazySingleton(() {
@@ -117,6 +131,26 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetMarket(sl()));
   sl.registerLazySingleton(() => GetStructures(sl()));
   sl.registerFactory(() => MarketBloc(getMarket: sl()));
+
+  //================================================
+  // FAVORIS (partagés par toute l'app : un seul bloc)
+  //================================================
+
+  sl.registerLazySingleton<FavoritesRemoteDataSource>(() => FavoritesRemoteDataSourceImpl(dio: sl()));
+  sl.registerLazySingleton<FavoritesRepository>(() => FavoritesRepositoryImpl(remoteDataSource: sl()));
+  sl.registerLazySingleton(() => GetFavoris(sl()));
+  sl.registerLazySingleton(() => ChangerFavori(sl()));
+  sl.registerLazySingleton(() => FavoritesBloc(getFavoris: sl(), changerFavori: sl()));
+
+  //================================================
+  // ALERTES
+  //================================================
+
+  sl.registerLazySingleton<AlertsRemoteDataSource>(() => AlertsRemoteDataSourceImpl(dio: sl()));
+  sl.registerLazySingleton<AlertsRepository>(() => AlertsRepositoryImpl(remoteDataSource: sl()));
+  sl.registerLazySingleton(() => GetAlertes(sl()));
+  sl.registerLazySingleton(() => MarquerAlertesLues(sl()));
+  sl.registerFactory(() => AlertsBloc(getAlertes: sl(), marquerLues: sl()));
 
   //================================================
   // ANALYSE D'UN TITRE

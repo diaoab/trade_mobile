@@ -3,7 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_color.dart';
 import '../../../../injection_container.dart';
+import '../../../onboarding/data/prise_en_main_service.dart';
+import '../../../onboarding/presentation/pages/prise_en_main_page.dart';
 import '../../../account/presentation/bloc/account_bloc.dart';
+import '../../../alerts/presentation/bloc/alerts_bloc.dart';
 import '../../../account/presentation/bloc/account_event.dart';
 import '../../../account/presentation/pages/account_page.dart';
 import '../../../billing/presentation/bloc/billing_bloc.dart';
@@ -25,6 +28,7 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) => MultiBlocProvider(
         providers: [
           BlocProvider(create: (_) => sl<MarketBloc>()),
+          BlocProvider(create: (_) => sl<AlertsBloc>()),
           BlocProvider(create: (_) => sl<PortfolioBloc>()),
           BlocProvider(create: (_) => sl<AccountBloc>()),
           BlocProvider(create: (_) => sl<BillingBloc>()),
@@ -51,12 +55,23 @@ class _OngletsState extends State<_Onglets> {
   void initState() {
     super.initState();
     _charger(0);
+    _priseEnMain();
+  }
+
+  /// Premier lancement sur cet appareil : la prise en main, une seule fois.
+  Future<void> _priseEnMain() async {
+    final service = sl<PriseEnMainService>();
+    if (await service.dejaVue() || !mounted) return;
+    await ouvrirPriseEnMain(context, onTerminee: service.marquerVue);
   }
 
   void _charger(int onglet) {
     switch (onglet) {
       case 0:
         context.read<MarketBloc>().add(LoadMarket());
+        // Pour la ligne « Votre portefeuille » du résumé du jour.
+        context.read<PortfolioBloc>().add(LoadPortfolio());
+        context.read<AlertsBloc>().add(LoadAlertes());
       case 1:
         context.read<PortfolioBloc>().add(LoadPortfolio());
       case 2:

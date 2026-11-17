@@ -20,8 +20,13 @@ class DetailIndicateur extends Equatable {
 }
 
 class ResultatDecision extends Equatable {
+  /// Signal stabilisé, fondé sur le score lissé ([score]).
   final String decision;
   final double score;
+
+  /// Score et signal bruts de la seule dernière séance.
+  final double? scoreSeance;
+  final String? decisionSeance;
   final double confiance;
   final double scoreTechnique;
   final double? scoreRisque;
@@ -34,6 +39,8 @@ class ResultatDecision extends Equatable {
   const ResultatDecision({
     required this.decision,
     required this.score,
+    this.scoreSeance,
+    this.decisionSeance,
     required this.confiance,
     required this.scoreTechnique,
     this.scoreRisque,
@@ -46,7 +53,7 @@ class ResultatDecision extends Equatable {
 
   @override
   List<Object?> get props =>
-      [decision, score, confiance, scoreTechnique, scoreRisque, positifs, negatifs, neutres, alertesLiquidite, details];
+      [decision, score, scoreSeance, decisionSeance, confiance, scoreTechnique, scoreRisque, positifs, negatifs, neutres, alertesLiquidite, details];
 }
 
 /// Modèle statistique : probabilité de surperformance à l'horizon donné.
@@ -89,6 +96,9 @@ class Analysis extends Equatable {
   final Dividende? dividende;
   final SeriesGraphique graphique;
 
+  /// Frais d'un aller-retour (achat + vente), en % : réglage du compte.
+  final double? fraisAllerRetour;
+
   const Analysis({
     required this.symbol,
     required this.nom,
@@ -99,10 +109,12 @@ class Analysis extends Equatable {
     required this.prediction,
     this.dividende,
     required this.graphique,
+    this.fraisAllerRetour,
   });
 
   @override
-  List<Object?> get props => [symbol, nom, cours, variation, seance, resultat, prediction, dividende, graphique];
+  List<Object?> get props =>
+      [symbol, nom, cours, variation, seance, resultat, prediction, dividende, graphique, fraisAllerRetour];
 }
 
 /// Message de la conversation avec l'assistant.

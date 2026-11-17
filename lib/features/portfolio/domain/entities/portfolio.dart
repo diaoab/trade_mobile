@@ -31,6 +31,12 @@ class Position extends Equatable {
   final double quantite;
   final double prixAchat;
   final String dateAchat;
+
+  /// Séance du cours utilisé pour la valorisation (AAAA-MM-JJ).
+  final String? dateCours;
+
+  /// Achat postérieur au dernier cours connu : pas encore de valorisation.
+  final bool enAttenteCours;
   final Valorisation? valorisation;
 
   const Position({
@@ -40,11 +46,13 @@ class Position extends Equatable {
     required this.quantite,
     required this.prixAchat,
     required this.dateAchat,
+    this.dateCours,
+    this.enAttenteCours = false,
     this.valorisation,
   });
 
   @override
-  List<Object?> get props => [id, symbol, nom, quantite, prixAchat, dateAchat, valorisation];
+  List<Object?> get props => [id, symbol, nom, quantite, prixAchat, dateAchat, dateCours, enAttenteCours, valorisation];
 }
 
 class TotauxPortefeuille extends Equatable {
@@ -55,6 +63,13 @@ class TotauxPortefeuille extends Equatable {
   final double net;
   final double? netPct;
 
+  /// Séance la plus ancienne parmi les cours utilisés : la valorisation
+  /// n'est pas plus récente que celle-ci.
+  final String? dateCours;
+
+  /// Positions achetées après le dernier cours, exclues des totaux.
+  final int enAttenteCours;
+
   const TotauxPortefeuille({
     required this.cout,
     required this.valeur,
@@ -62,12 +77,14 @@ class TotauxPortefeuille extends Equatable {
     required this.frais,
     required this.net,
     this.netPct,
+    this.dateCours,
+    this.enAttenteCours = 0,
   });
 
   double get plusValueLatente => valeur - cout;
 
   @override
-  List<Object?> get props => [cout, valeur, dividendes, frais, net, netPct];
+  List<Object?> get props => [cout, valeur, dividendes, frais, net, netPct, dateCours, enAttenteCours];
 }
 
 class Portfolio extends Equatable {

@@ -20,6 +20,9 @@ class MarketEntry extends Equatable {
   final double? variation;
   final String? date;
   final String? decision;
+
+  /// Signal de la séance précédente, pour repérer les bascules.
+  final String? decisionPrecedente;
   final double? score;
 
   /// Changements notables depuis la séance précédente (« RSI en survente »…).
@@ -36,6 +39,7 @@ class MarketEntry extends Equatable {
     this.variation,
     this.date,
     this.decision,
+    this.decisionPrecedente,
     this.score,
     this.changements = const [],
     this.dividende,
@@ -43,5 +47,5 @@ class MarketEntry extends Equatable {
   });
 
   @override
-  List<Object?> get props => [symbol, nom, cours, variation, date, decision, score, changements, dividende, spark];
+  List<Object?> get props => [symbol, nom, cours, variation, date, decision, decisionPrecedente, score, changements, dividende, spark];
 }
