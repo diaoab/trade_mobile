@@ -4,6 +4,7 @@ import '../../domain/usecases/change_password.dart';
 import '../../domain/usecases/delete_account.dart';
 import '../../domain/usecases/get_preferences.dart';
 import '../../domain/usecases/update_preferences.dart';
+import '../../domain/usecases/update_profile.dart';
 import 'account_event.dart';
 import 'account_state.dart';
 
@@ -12,17 +13,29 @@ class AccountBloc extends Bloc<AccountEvent, AccountState> {
   final UpdatePreferences updatePreferences;
   final ChangePassword changePassword;
   final DeleteAccount deleteAccount;
+  final UpdateProfile updateProfile;
 
   AccountBloc({
     required this.getPreferences,
     required this.updatePreferences,
     required this.changePassword,
     required this.deleteAccount,
+    required this.updateProfile,
   }) : super(const AccountState()) {
     on<LoadPreferences>(_onLoad);
     on<PreferencesChanged>(_onChanged);
     on<ChangePasswordEvent>(_onChangePassword);
     on<DeleteAccountEvent>(_onDelete);
+    on<ProfileChanged>(_onProfile);
+  }
+
+  Future<void> _onProfile(ProfileChanged event, Emitter<AccountState> emit) async {
+    emit(state.copyWith(profilEnCours: true));
+    final result = await updateProfile(prenom: event.prenom, nom: event.nom, telephone: event.telephone);
+    result.fold(
+      (f) => emit(state.copyWith(profilEnCours: false, erreurProfil: f.errorMessage)),
+      (u) => emit(state.copyWith(profilEnCours: false, profilModifie: u)),
+    );
   }
 
   Future<void> _onLoad(LoadPreferences event, Emitter<AccountState> emit) async {

@@ -23,8 +23,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AppStarted>(_onAppStarted);
     on<LoginRequested>(_onLogin);
     on<LogoutRequested>(_onLogout);
-    on<SessionExpired>((_, emit) => emit(Unauthenticated(erreur: const SessionFailure().errorMessage)));
+    on<SessionExpired>((event, emit) => emit(Unauthenticated(erreur: event.message ?? const SessionFailure().errorMessage)));
     on<UserRefreshRequested>(_onRefresh);
+    on<UserUpdated>((event, emit) => emit(Authenticated(event.user)));
   }
 
   Future<void> _onAppStarted(AppStarted event, Emitter<AuthState> emit) async {

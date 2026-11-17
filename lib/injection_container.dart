@@ -5,6 +5,7 @@ import 'package:get_it/get_it.dart';
 
 import 'core/config/env.dart';
 import 'core/network/auth_interceptor.dart';
+import 'core/network/etag_interceptor.dart';
 import 'core/services/token_service.dart';
 
 // Account
@@ -15,6 +16,7 @@ import 'features/account/domain/usecases/change_password.dart';
 import 'features/account/domain/usecases/delete_account.dart';
 import 'features/account/domain/usecases/get_preferences.dart';
 import 'features/account/domain/usecases/update_preferences.dart';
+import 'features/account/domain/usecases/update_profile.dart';
 import 'features/account/presentation/bloc/account_bloc.dart';
 
 // Analysis
@@ -33,7 +35,9 @@ import 'features/auth/domain/usecases/get_current_user.dart';
 import 'features/auth/domain/usecases/login_user.dart';
 import 'features/auth/domain/usecases/logout_user.dart';
 import 'features/auth/domain/usecases/register_user.dart';
+import 'features/auth/domain/usecases/reset_password.dart';
 import 'features/auth/presentation/bloc/auth_bloc.dart';
+import 'features/auth/presentation/bloc/reset_password_bloc.dart';
 
 // Billing
 import 'features/billing/data/datasources/billing_remote_datasource.dart';
@@ -70,6 +74,7 @@ Future<void> init() async {
 
   sl.registerLazySingleton(() => const FlutterSecureStorage());
   sl.registerLazySingleton(() => TokenService(secureStorage: sl()));
+  sl.registerLazySingleton(() => EtagInterceptor());
 
   sl.registerLazySingleton(() {
     final dio = Dio(BaseOptions(
@@ -80,7 +85,9 @@ Future<void> init() async {
       contentType: 'application/json',
       headers: {'Accept': 'application/json'},
     ));
-    dio.interceptors.add(AuthInterceptor(dio: dio, tokenService: sl()));
+    dio.interceptors
+      ..add(AuthInterceptor(dio: dio, tokenService: sl()))
+      ..add(sl<EtagInterceptor>());
     if (kDebugMode) {
       dio.interceptors.add(LogInterceptor(requestBody: false, responseBody: false, logPrint: (o) => debugPrint('$o')));
     }
@@ -98,6 +105,8 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetCurrentUser(sl()));
   sl.registerLazySingleton(() => LogoutUser(sl()));
   sl.registerLazySingleton(() => AuthBloc(loginUser: sl(), registerUser: sl(), getCurrentUser: sl(), logoutUser: sl()));
+  sl.registerLazySingleton(() => ResetPassword(sl()));
+  sl.registerFactory(() => ResetPasswordBloc(resetPassword: sl()));
 
   //================================================
   // MARCHÉ
@@ -141,7 +150,14 @@ Future<void> init() async {
   sl.registerLazySingleton(() => UpdatePreferences(sl()));
   sl.registerLazySingleton(() => ChangePassword(sl()));
   sl.registerLazySingleton(() => DeleteAccount(sl()));
-  sl.registerFactory(() => AccountBloc(getPreferences: sl(), updatePreferences: sl(), changePassword: sl(), deleteAccount: sl()));
+  sl.registerLazySingleton(() => UpdateProfile(sl()));
+  sl.registerFactory(() => AccountBloc(
+        getPreferences: sl(),
+        updatePreferences: sl(),
+        changePassword: sl(),
+        deleteAccount: sl(),
+        updateProfile: sl(),
+      ));
 
   //================================================
   // ABONNEMENT

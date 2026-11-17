@@ -44,15 +44,27 @@ class AssistantBloc extends Bloc<AssistantEvent, AssistantState> {
     final avant = state.messages;
     final messages = [...avant, MessageAssistant(role: 'user', contenu: question)];
     emit(state.copyWith(messages: messages, enCours: true));
-    final result = await askAssistant(symbol, messages);
-    result.fold(
-      // La question refusée est retirée : on peut la reposer telle quelle.
-      (f) => emit(state.copyWith(messages: avant, enCours: false, erreur: f.errorMessage)),
-      (r) => emit(state.copyWith(
-        messages: [...messages, MessageAssistant(role: 'assistant', contenu: r.reponse)],
-        enCours: false,
-        quota: r.quota,
-      )),
+
+    // La réponse s'affiche pendant qu'elle s'écrit.
+    var reponse = '';
+    List<MessageAssistant> avecReponse() => [...messages, MessageAssistant(role: 'assistant', contenu: reponse)];
+
+    await emit.forEach(
+      askAssistant(symbol, messages),
+      onData: (resultat) => resultat.fold(
+        // La question refusée (ou interrompue) est retirée avec sa réponse
+        // partielle : on peut la reposer telle quelle, le quota est rendu.
+        (f) => state.copyWith(messages: avant, enCours: false, erreur: f.errorMessage),
+        (evenement) {
+          switch (evenement) {
+            case MorceauAssistant(:final texte):
+              reponse += texte;
+              return state.copyWith(messages: avecReponse());
+            case FinAssistant(:final quota):
+              return state.copyWith(messages: avecReponse(), enCours: false, quota: quota);
+          }
+        },
+      ),
     );
   }
 }

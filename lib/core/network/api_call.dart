@@ -26,18 +26,36 @@ ServerException versException(DioException e) {
   return ServerException('Une erreur est survenue.', statusCode: e.response?.statusCode);
 }
 
+/// Traduit une erreur d'appel en [Failure] (401 : session à reprendre).
+Failure versFailure(Object erreur) {
+  final exception = switch (erreur) {
+    DioException e => versException(e),
+    ServerException e => e,
+    _ => null,
+  };
+  if (exception == null) return ServerFailure(errorMessage: 'Réponse inattendue : $erreur');
+  if (exception.statusCode == 401) return const SessionFailure();
+  return ServerFailure(errorMessage: exception.message);
+}
+
 /// Exécute un appel de datasource et renvoie l'échec sous forme de [Failure].
 /// Utilisé par tous les repositories.
 Future<Either<Failure, T>> appelApi<T>(Future<T> Function() appel) async {
   try {
     return Right(await appel());
-  } on DioException catch (e) {
-    final exception = versException(e);
-    if (exception.statusCode == 401) return const Left(SessionFailure());
-    return Left(ServerFailure(errorMessage: exception.message));
-  } on ServerException catch (e) {
-    return Left(ServerFailure(errorMessage: e.message));
   } catch (e) {
-    return Left(ServerFailure(errorMessage: 'Réponse inattendue : $e'));
+    return Left(versFailure(e));
+  }
+}
+
+/// Comme [appelApi], pour une réponse en flux : chaque élément en [Right],
+/// puis l'échec éventuel en [Left] (le flux s'arrête alors).
+Stream<Either<Failure, T>> fluxApi<T>(Stream<T> Function() appel) async* {
+  try {
+    await for (final element in appel()) {
+      yield Right(element);
+    }
+  } catch (e) {
+    yield Left(versFailure(e));
   }
 }

@@ -2,10 +2,14 @@ import 'package:dio/dio.dart';
 
 import '../../../../core/config/env.dart';
 import '../../../../core/network/api_call.dart';
+import '../../../auth/data/models/user_model.dart';
 import '../../domain/entities/preferences.dart';
 import '../models/preferences_model.dart';
 
 abstract class AccountRemoteDataSource {
+  /// `null` efface le champ. Renvoie le compte à jour.
+  Future<UserModel> modifierProfil({required String? prenom, required String? nom, required String? telephone});
+
   Future<PreferencesModel> getPreferences();
   Future<PreferencesModel> modifierPreferences(ModificationPreferences modification);
 
@@ -17,6 +21,14 @@ abstract class AccountRemoteDataSource {
 class AccountRemoteDataSourceImpl implements AccountRemoteDataSource {
   final Dio dio;
   AccountRemoteDataSourceImpl({required this.dio});
+
+  @override
+  Future<UserModel> modifierProfil({required String? prenom, required String? nom, required String? telephone}) async =>
+      UserModel.fromJson(donnees(await dio.patch(Env.accountMe, data: {
+        'first_name': prenom,
+        'last_name': nom,
+        'phone': telephone,
+      })));
 
   @override
   Future<PreferencesModel> getPreferences() async =>

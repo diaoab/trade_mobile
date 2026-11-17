@@ -8,11 +8,23 @@ class QuotaModel extends Quota {
 }
 
 class UserModel extends User {
-  const UserModel({required super.id, required super.email, required super.plan, super.proJusquau, required super.assistant});
+  const UserModel({
+    required super.id,
+    required super.email,
+    super.prenom,
+    super.nom,
+    super.telephone,
+    required super.plan,
+    super.proJusquau,
+    required super.assistant,
+  });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
         id: json['id'] as int,
         email: json['email'] as String,
+        prenom: json['first_name'] as String?,
+        nom: json['last_name'] as String?,
+        telephone: json['phone'] as String?,
         plan: json['plan'] as String,
         proJusquau: json['pro_until'] as String?,
         assistant: QuotaModel.fromJson(json['assistant'] as Map<String, dynamic>),

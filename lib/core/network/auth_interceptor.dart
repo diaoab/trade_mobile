@@ -7,6 +7,10 @@ import '../services/token_service.dart';
 
 /// Ajoute le jeton d'accès et le renouvelle sur un 401.
 ///
+/// Un 403 sur une route authentifiée signale un compte désactivé depuis le
+/// back-office (seul cas de 403 pour l'app) : la session est effacée et
+/// l'app revient à la connexion avec le message de l'API.
+///
 /// Un seul renouvellement à la fois : plusieurs écrans peuvent recevoir un
 /// 401 en même temps, et l'API refuse un jeton de rafraîchissement déjà
 /// utilisé (elle ferme alors toutes les sessions du compte).
@@ -42,6 +46,13 @@ class AuthInterceptor extends Interceptor {
   Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
     final options = err.requestOptions;
     final estPublic = options.extra[skip] == true || _publics.contains(options.path);
+
+    if (err.response?.statusCode == 403 && !estPublic) {
+      final corps = err.response?.data;
+      await tokenService.clear();
+      AuthEventBus.instance.emitLogout(corps is Map && corps['message'] is String ? corps['message'] as String : null);
+      return handler.next(err);
+    }
 
     if (err.response?.statusCode != 401 || estPublic || options.extra['retried'] == true) {
       return handler.next(err);

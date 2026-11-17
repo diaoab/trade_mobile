@@ -14,6 +14,6 @@ class AnalysisRepositoryImpl implements AnalysisRepository {
   Future<Either<Failure, Analysis>> getAnalysis(String symbol) => appelApi(() => remoteDataSource.getAnalysis(symbol));
 
   @override
-  Future<Either<Failure, ReponseAssistant>> demander(String symbol, List<MessageAssistant> messages) =>
-      appelApi(() => remoteDataSource.demander(symbol, messages));
+  Stream<Either<Failure, EvenementAssistant>> demander(String symbol, List<MessageAssistant> messages) =>
+      fluxApi(() => remoteDataSource.demander(symbol, messages));
 }

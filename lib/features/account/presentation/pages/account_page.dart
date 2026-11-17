@@ -19,6 +19,7 @@ import '../bloc/account_bloc.dart';
 import '../bloc/account_event.dart';
 import '../bloc/account_state.dart';
 import '../widgets/change_password_section.dart';
+import '../widgets/profile_section.dart';
 
 /// Libellés complets des indicateurs (clés de INDICATOR_OPTIONS côté API).
 const _libellesIndicateurs = {
@@ -45,11 +46,12 @@ class AccountPage extends StatelessWidget {
         final prefs = state.preferences;
         return AppEcran(
           titre: 'Compte',
-          sousTitre: user?.email,
+          sousTitre: user?.nomAffiche,
           enfants: [
             if (user != null) ProOffer(user: user),
             MessageErreur(state.erreur),
             if (state.chargement) const Chargement(),
+            if (user != null) ProfileSection(user: user),
             if (prefs != null) ..._reglages(context, prefs),
             const ChangePasswordSection(),
             AppSection(

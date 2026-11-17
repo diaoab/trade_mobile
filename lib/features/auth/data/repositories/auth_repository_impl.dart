@@ -35,6 +35,17 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
+  Future<Either<Failure, void>> demanderCode(String email) => appelApi(() => remoteDataSource.demanderCode(email));
+
+  @override
+  Future<Either<Failure, void>> verifierCode(String email, String code) =>
+      appelApi(() => remoteDataSource.verifierCode(email, code));
+
+  @override
+  Future<Either<Failure, void>> reinitialiser(String email, String code, String nouveau) =>
+      appelApi(() => remoteDataSource.reinitialiser(email, code, nouveau));
+
+  @override
   Future<void> logout() async {
     final refreshToken = await tokenService.getRefreshToken();
     // Sans réseau, on se déconnecte quand même : la session expirera côté serveur.

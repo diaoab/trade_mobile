@@ -12,4 +12,10 @@ abstract class AuthRepository {
 
   /// Ferme la session côté serveur (au mieux) et efface les jetons.
   Future<void> logout();
+
+  /// Mot de passe oublié : code envoyé par e-mail, vérifié, puis nouveau
+  /// mot de passe (toutes les sessions sont fermées, il faut se reconnecter).
+  Future<Either<Failure, void>> demanderCode(String email);
+  Future<Either<Failure, void>> verifierCode(String email, String code);
+  Future<Either<Failure, void>> reinitialiser(String email, String code, String nouveau);
 }

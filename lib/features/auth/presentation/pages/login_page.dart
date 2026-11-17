@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/signaux.dart';
+import '../../../../core/routes/app_router.dart';
 import '../../../../core/theme/app_color.dart';
 import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_typo.dart';
@@ -87,6 +88,16 @@ class _LoginPageState extends State<LoginPage> {
                         onSubmitted: (_) => _soumettre(),
                         onChanged: (_) => setState(() {}),
                       ),
+                      if (!_creation)
+                        Align(
+                          alignment: Alignment.centerRight,
+                          child: AppLien(
+                            libelle: 'Mot de passe oublié ?',
+                            onPressed: enCours
+                                ? null
+                                : () => Navigator.of(context).pushNamed(AppRouter.resetPasswordRoute, arguments: _email.text.trim()),
+                          ),
+                        ),
                     ],
                   ),
                 ),

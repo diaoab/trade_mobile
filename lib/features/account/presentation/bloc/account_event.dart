@@ -16,3 +16,10 @@ class ChangePasswordEvent extends AccountEvent {
 }
 
 class DeleteAccountEvent extends AccountEvent {}
+
+class ProfileChanged extends AccountEvent {
+  final String prenom;
+  final String nom;
+  final String telephone;
+  ProfileChanged({required this.prenom, required this.nom, required this.telephone});
+}

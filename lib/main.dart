@@ -31,8 +31,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    // Déconnexion forcée depuis l'intercepteur Dio (session refusée par l'API).
-    AuthEventBus.instance.onLogout.listen((_) => di.sl<AuthBloc>().add(SessionExpired()));
+    // Déconnexion forcée depuis l'intercepteur Dio (session refusée, compte désactivé).
+    AuthEventBus.instance.onLogout.listen((message) => di.sl<AuthBloc>().add(SessionExpired(message: message)));
   }
 
   @override

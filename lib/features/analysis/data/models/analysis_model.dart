@@ -1,4 +1,3 @@
-import '../../../auth/data/models/user_model.dart';
 import '../../../market/data/models/market_entry_model.dart';
 import '../../domain/entities/analysis.dart';
 
@@ -66,13 +65,4 @@ class AnalysisModel extends Analysis {
       ),
     );
   }
-}
-
-class ReponseAssistantModel extends ReponseAssistant {
-  const ReponseAssistantModel({required super.reponse, required super.quota});
-
-  factory ReponseAssistantModel.fromJson(Map<String, dynamic> json) => ReponseAssistantModel(
-        reponse: json['answer'] as String,
-        quota: QuotaModel.fromJson(json['assistant'] as Map<String, dynamic>),
-      );
 }

@@ -62,6 +62,24 @@ void main() {
   );
 
   blocTest<AuthBloc, AuthState>(
+    'un compte désactivé revient à la connexion avec le message de l’API',
+    build: bloc,
+    seed: () => Authenticated(_user),
+    act: (b) => b.add(SessionExpired(message: 'Ton compte a été désactivé. Contacte le support.')),
+    expect: () => [
+      isA<Unauthenticated>().having((s) => s.erreur, 'erreur', 'Ton compte a été désactivé. Contacte le support.'),
+    ],
+  );
+
+  blocTest<AuthBloc, AuthState>(
+    'le compte modifié (profil) remplace le compte affiché',
+    build: bloc,
+    seed: () => Authenticated(_user),
+    act: (b) => b.add(UserUpdated(const User(id: 1, email: 'a@example.com', prenom: 'Awa', plan: 'free', assistant: Quota(utilisees: 0, limite: 3)))),
+    expect: () => [isA<Authenticated>().having((s) => s.user.nomAffiche, 'nom', 'Awa')],
+  );
+
+  blocTest<AuthBloc, AuthState>(
     'une erreur réseau à l’actualisation du compte ne déconnecte pas',
     setUp: () => when(() => repo.utilisateurCourant())
         .thenAnswer((_) async => const Left(ServerFailure(errorMessage: 'Serveur injoignable'))),

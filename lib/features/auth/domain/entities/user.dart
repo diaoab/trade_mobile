@@ -14,16 +14,34 @@ class Quota extends Equatable {
 class User extends Equatable {
   final int id;
   final String email;
+  final String? prenom;
+  final String? nom;
+  final String? telephone;
 
   /// "free" ou "pro" (offre en vigueur).
   final String plan;
   final String? proJusquau;
   final Quota assistant;
 
-  const User({required this.id, required this.email, required this.plan, this.proJusquau, required this.assistant});
+  const User({
+    required this.id,
+    required this.email,
+    this.prenom,
+    this.nom,
+    this.telephone,
+    required this.plan,
+    this.proJusquau,
+    required this.assistant,
+  });
 
   bool get estPro => plan == 'pro';
 
+  /// Prénom et nom, sinon l'e-mail.
+  String get nomAffiche {
+    final complet = [prenom, nom].whereType<String>().where((s) => s.isNotEmpty).join(' ');
+    return complet.isEmpty ? email : complet;
+  }
+
   @override
-  List<Object?> get props => [id, email, plan, proJusquau, assistant];
+  List<Object?> get props => [id, email, prenom, nom, telephone, plan, proJusquau, assistant];
 }

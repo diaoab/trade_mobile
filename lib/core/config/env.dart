@@ -35,6 +35,9 @@ class Env {
   static const String authRefresh = '/auth/refresh';
   static const String authLogout = '/auth/logout';
   static const String authPassword = '/auth/password';
+  static const String authForgotPassword = '/auth/forgot-password';
+  static const String authVerifyResetCode = '/auth/verify-reset-code';
+  static const String authResetPassword = '/auth/reset-password';
 
   // ─── Compte ────────────────────────────────────────────────────────────
   static const String accountMe = '/account/me';
@@ -44,7 +47,8 @@ class Env {
   static const String market = '/market';
   static const String structures = '/structures';
   static String analyse(String symbol) => '/structures/$symbol/analysis';
-  static String assistant(String symbol) => '/structures/$symbol/assistant';
+  /// Réponse de l'assistant en Server-Sent Events (texte affiché pendant qu'il s'écrit).
+  static String assistantFlux(String symbol) => '/structures/$symbol/assistant/stream';
 
   // ─── Portefeuille ──────────────────────────────────────────────────────
   static const String portfolio = '/portfolio';

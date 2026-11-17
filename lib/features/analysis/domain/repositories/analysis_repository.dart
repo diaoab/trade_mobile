@@ -5,5 +5,7 @@ import '../entities/analysis.dart';
 
 abstract class AnalysisRepository {
   Future<Either<Failure, Analysis>> getAnalysis(String symbol);
-  Future<Either<Failure, ReponseAssistant>> demander(String symbol, List<MessageAssistant> messages);
+
+  /// Réponse de l'assistant morceau par morceau ; un échec arrête le flux.
+  Stream<Either<Failure, EvenementAssistant>> demander(String symbol, List<MessageAssistant> messages);
 }

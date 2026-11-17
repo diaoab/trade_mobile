@@ -83,7 +83,9 @@ class _AssistantSectionState extends State<AssistantSection> {
                               child: Text(m.contenu, style: AppTypo.style(taille: 16, couleur: c.texte, hauteur: 1.5)),
                             ),
                     ),
-                  if (state.enCours) const TexteDiscret('Analyse en cours…'),
+                  // Jusqu'au premier morceau de la réponse.
+                  if (state.enCours && (state.messages.isEmpty || state.messages.last.deLUtilisateur))
+                    const TexteDiscret('Analyse en cours…'),
                 ],
               ),
             ),

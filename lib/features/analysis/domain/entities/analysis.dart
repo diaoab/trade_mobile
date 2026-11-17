@@ -121,13 +121,25 @@ class MessageAssistant extends Equatable {
   List<Object?> get props => [role, contenu];
 }
 
-/// Réponse de l'assistant et quota restant pour la journée.
-class ReponseAssistant extends Equatable {
-  final String reponse;
-  final Quota quota;
+/// Élément de la réponse de l'assistant, qui arrive morceau par morceau.
+sealed class EvenementAssistant extends Equatable {
+  const EvenementAssistant();
+}
 
-  const ReponseAssistant({required this.reponse, required this.quota});
+/// Morceau de texte, à ajouter à la suite des précédents.
+class MorceauAssistant extends EvenementAssistant {
+  final String texte;
+  const MorceauAssistant(this.texte);
 
   @override
-  List<Object?> get props => [reponse, quota];
+  List<Object?> get props => [texte];
+}
+
+/// Fin de la réponse, avec le quota restant pour la journée.
+class FinAssistant extends EvenementAssistant {
+  final Quota quota;
+  const FinAssistant(this.quota);
+
+  @override
+  List<Object?> get props => [quota];
 }
