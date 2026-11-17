@@ -66,7 +66,7 @@ class _AssistantSectionState extends State<AssistantSection> {
                           ActionChip(
                             label: Text(s, style: AppTypo.style(taille: 14, couleur: c.texte)),
                             onPressed: state.enCours ? null : () => _envoyer(s),
-                            backgroundColor: c.fond,
+                            backgroundColor: c.champ,
                             side: BorderSide(color: c.separateur),
                             shape: const StadiumBorder(),
                           ),
@@ -93,7 +93,7 @@ class _AssistantSectionState extends State<AssistantSection> {
             Container(
               margin: const EdgeInsets.fromLTRB(AppEspace.gouttiere, 14, AppEspace.gouttiere, 0),
               padding: const EdgeInsets.fromLTRB(14, 6, 6, 6),
-              decoration: BoxDecoration(color: c.surface, borderRadius: BorderRadius.circular(AppRayon.l)),
+              decoration: BoxDecoration(color: c.champ, borderRadius: BorderRadius.circular(AppRayon.l)),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [

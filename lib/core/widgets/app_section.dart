@@ -4,13 +4,15 @@ import '../theme/app_color.dart';
 import '../theme/app_dimensions.dart';
 import '../theme/app_typo.dart';
 
-/// Bloc titré d'un écran : titre discret en capitales, action à droite.
+/// Bloc titré d'un écran : titre discret en capitales, action à droite, et
+/// contenu posé sur une carte arrondie ([carte] faux : directement sur le fond).
 class AppSection extends StatelessWidget {
   final String? titre;
   final Widget? action;
   final List<Widget> enfants;
+  final bool carte;
 
-  const AppSection({super.key, this.titre, this.action, required this.enfants});
+  const AppSection({super.key, this.titre, this.action, required this.enfants, this.carte = true});
 
   @override
   Widget build(BuildContext context) {
@@ -22,19 +24,32 @@ class AppSection extends StatelessWidget {
         children: [
           if (titre != null || action != null)
             Padding(
-              padding: const EdgeInsets.fromLTRB(AppEspace.gouttiere, 0, AppEspace.gouttiere, 6),
+              padding: const EdgeInsets.fromLTRB(AppEspace.gouttiere, 0, AppEspace.gouttiere, 8),
               child: Row(
                 children: [
                   if (titre != null)
                     Expanded(
                       child: Text(titre!.toUpperCase(),
-                          style: AppTypo.style(taille: 13, graisse: FontWeight.w600, couleur: c.texteMoyen, interlettre: 0.4)),
+                          style: AppTypo.style(taille: 12, graisse: FontWeight.w700, couleur: c.texteMoyen, interlettre: 0.8)),
                     ),
                   ?action,
                 ],
               ),
             ),
-          ...enfants,
+          if (carte)
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: AppEspace.carte),
+              padding: const EdgeInsets.symmetric(vertical: AppEspace.m),
+              decoration: BoxDecoration(
+                color: c.surface,
+                borderRadius: BorderRadius.circular(AppRayon.carte),
+                border: Border.all(color: c.separateur.withValues(alpha: 0.6), width: 0.6),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: enfants),
+            )
+          else
+            ...enfants,
         ],
       ),
     );
@@ -71,7 +86,7 @@ class AppLigne extends StatelessWidget {
         if (onTap == null)
           contenu
         else
-          InkWell(onTap: onTap, highlightColor: context.couleurs.surface, splashColor: Colors.transparent, child: contenu),
+          InkWell(onTap: onTap, highlightColor: context.couleurs.champ, splashColor: Colors.transparent, child: contenu),
         if (!derniere) const AppFilet(),
       ],
     );

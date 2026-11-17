@@ -29,13 +29,17 @@ class AppBouton extends StatelessWidget {
     return Opacity(
       opacity: onPressed == null ? 0.35 : 1,
       child: SizedBox(
-        height: 50,
+        height: 52,
         child: TextButton(
           onPressed: actif ? onPressed : null,
           style: TextButton.styleFrom(
-            backgroundColor: secondaire ? c.surface : c.encre,
-            disabledBackgroundColor: secondaire ? c.surface : c.encre,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRayon.l)),
+            backgroundColor: secondaire ? c.champ : c.encre,
+            disabledBackgroundColor: secondaire ? c.champ : c.encre,
+            foregroundColor: texte,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRayon.l),
+              side: secondaire ? BorderSide(color: c.separateur) : BorderSide.none,
+            ),
           ),
           child: enChargement
               ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: texte))
@@ -61,7 +65,7 @@ class AppLien extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.all(4),
           child: Text(libelle,
-              style: AppTypo.style(taille: 16, graisse: FontWeight.w600, couleur: couleur ?? context.couleurs.texte)),
+              style: AppTypo.style(taille: 16, graisse: FontWeight.w600, couleur: couleur ?? context.couleurs.encre)),
         ),
       );
 }

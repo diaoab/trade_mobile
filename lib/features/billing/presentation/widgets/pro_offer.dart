@@ -104,15 +104,24 @@ class _ProOfferState extends State<ProOffer> with WidgetsBindingObserver {
     final c = context.couleurs;
     final offre = state.offre;
     TextStyle sur(double taille, {FontWeight graisse = FontWeight.w400, double opacite = 1}) =>
-        AppTypo.style(taille: taille, graisse: graisse, couleur: c.surEncre.withValues(alpha: opacite), hauteur: 1.4);
+        AppTypo.style(taille: taille, graisse: graisse, couleur: c.texte.withValues(alpha: opacite), hauteur: 1.4);
     return Container(
-      margin: const EdgeInsets.fromLTRB(AppEspace.gouttiere, 20, AppEspace.gouttiere, 0),
+      margin: const EdgeInsets.fromLTRB(AppEspace.carte, 20, AppEspace.carte, 0),
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: c.encre, borderRadius: BorderRadius.circular(AppRayon.xl)),
+      // Carte sombre teintée de turquoise : mise en avant sans éblouir.
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [c.encre.withValues(alpha: 0.28), c.surface],
+        ),
+        borderRadius: BorderRadius.circular(AppRayon.carte),
+        border: Border.all(color: c.encre.withValues(alpha: 0.35)),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('OFFRE PRO', style: sur(12, graisse: FontWeight.w700, opacite: 0.6).copyWith(letterSpacing: 1)),
+          Text('OFFRE PRO', style: sur(12, graisse: FontWeight.w700).copyWith(letterSpacing: 1, color: c.encre)),
           const SizedBox(height: AppEspace.s),
           Text('${offre != null ? '${offre.limiteAssistant} questions par jour' : 'Plus de questions'} à l’assistant',
               style: sur(22, graisse: FontWeight.w700).copyWith(letterSpacing: -0.4, height: 1.2)),
@@ -141,14 +150,14 @@ class _ProOfferState extends State<ProOffer> with WidgetsBindingObserver {
                       ? () => context.read<BillingBloc>().add(SouscriptionDemandee())
                       : null,
                   style: FilledButton.styleFrom(
-                    backgroundColor: c.surEncre,
-                    disabledBackgroundColor: c.surEncre,
-                    foregroundColor: c.encre,
-                    disabledForegroundColor: c.encre,
+                    backgroundColor: c.encre,
+                    disabledBackgroundColor: c.encre,
+                    foregroundColor: c.surEncre,
+                    disabledForegroundColor: c.surEncre,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRayon.m)),
                   ),
                   child: state.enCours
-                      ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: c.encre))
+                      ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: c.surEncre))
                       : const Text('Passer Pro', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15)),
                 ),
               ),

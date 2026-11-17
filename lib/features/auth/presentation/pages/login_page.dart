@@ -52,96 +52,120 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final c = context.couleurs;
     return Scaffold(
-      body: SafeArea(
-        child: BlocBuilder<AuthBloc, AuthState>(
-          builder: (context, state) {
-            final enCours = state is AuthLoading;
-            return AutofillGroup(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: kLargeurMax),
-                  child: ListView(
-                    keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-                    padding: const EdgeInsets.fromLTRB(AppEspace.gouttiere, AppEspace.l, AppEspace.gouttiere, 32),
-                    children: [
-                      const _Marque(),
-                      const SizedBox(height: AppEspace.xl),
-                      Text('Les marchés de la BRVM, lus pour vous.',
-                          style: AppTypo.style(taille: 30, graisse: FontWeight.w700, couleur: c.texte, interlettre: -0.8, hauteur: 1.15)),
-                      const SizedBox(height: AppEspace.m),
-                      Text('Un signal clair par titre chaque soir, votre portefeuille et vos dividendes au même endroit.',
-                          style: AppTypo.style(taille: 16, couleur: c.texteMoyen, hauteur: 1.45)),
-                      const SizedBox(height: AppEspace.xl),
-                      const _Apercu(),
-                      const SizedBox(height: 28),
-                      _Bascule(
-                        creation: _creation,
-                        onChange: enCours ? null : (creation) => setState(() => _creation = creation),
-                      ),
-                      const SizedBox(height: AppEspace.xl),
-                      AppChampTexte(
-                        libelle: 'Adresse e-mail',
-                        controller: _email,
-                        icone: Icons.mail_outline,
-                        indication: 'vous@exemple.com',
-                        clavier: TextInputType.emailAddress,
-                        autofill: const [AutofillHints.email],
-                        onChanged: (_) => setState(() {}),
-                      ),
-                      const SizedBox(height: 18),
-                      AppChampTexte(
-                        libelle: 'Mot de passe',
-                        controller: _motDePasse,
-                        icone: Icons.lock_outline,
-                        motDePasse: true,
-                        indication: _creation ? '8 caractères minimum' : null,
-                        autofill: [_creation ? AutofillHints.newPassword : AutofillHints.password],
-                        onSubmitted: (_) => _soumettre(),
-                        onChanged: (_) => setState(() {}),
-                      ),
-                      if (!_creation)
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: AppEspace.xs),
-                            child: AppLien(
-                              libelle: 'Mot de passe oublié ?',
-                              couleur: c.texteMoyen,
-                              onPressed: enCours
-                                  ? null
-                                  : () => Navigator.of(context).pushNamed(AppRouter.resetPasswordRoute, arguments: _email.text.trim()),
-                            ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: RadialGradient(
+            center: const Alignment(0.9, -1.1),
+            radius: 1.2,
+            colors: [c.encre.withValues(alpha: 0.18), c.fond],
+          ),
+        ),
+        child: SafeArea(
+          child: BlocBuilder<AuthBloc, AuthState>(
+            builder: (context, state) {
+              final enCours = state is AuthLoading;
+              return AutofillGroup(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: kLargeurMax),
+                    child: ListView(
+                      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                      padding: const EdgeInsets.fromLTRB(AppEspace.gouttiere, AppEspace.l, AppEspace.gouttiere, 32),
+                      children: [
+                        const _Marque(),
+                        const SizedBox(height: AppEspace.xl),
+                        Text(
+                          'Les marchés de la BRVM, lus pour vous.',
+                          style: AppTypo.style(
+                            taille: 30,
+                            graisse: FontWeight.w700,
+                            couleur: c.texte,
+                            interlettre: -0.8,
+                            hauteur: 1.15,
                           ),
                         ),
-                      if (state is Unauthenticated && state.erreur != null)
-                        Padding(
-                          padding: const EdgeInsets.only(top: AppEspace.m),
-                          child: _Erreur(state.erreur!),
+                        const SizedBox(height: AppEspace.m),
+                        Text(
+                          'Un signal clair par titre chaque soir, votre portefeuille et vos dividendes au même endroit.',
+                          style: AppTypo.style(taille: 16, couleur: c.texteMoyen, hauteur: 1.45),
                         ),
-                      const SizedBox(height: AppEspace.l),
-                      AppBouton(
-                        libelle: _creation ? 'Créer mon compte' : 'Se connecter',
-                        enChargement: enCours,
-                        onPressed: _complet ? _soumettre : null,
-                      ),
-                      const SizedBox(height: AppEspace.xl),
-                      const _Separateur(),
-                      const SizedBox(height: AppEspace.xl),
-                      AppBouton(
-                        libelle: 'Découvrir sans compte',
-                        secondaire: true,
-                        onPressed: enCours ? null : () => context.read<AuthBloc>().add(ContinuerSansCompte()),
-                      ),
-                      const SizedBox(height: AppEspace.s),
-                      Text('Démo du marché et des analyses, en lecture seule.',
-                          textAlign: TextAlign.center, style: AppTypo.style(taille: 13, couleur: c.texteFaible)),
-                      const NotePied(kAvertissement),
-                    ],
+                        const SizedBox(height: AppEspace.xl),
+                        const _Apercu(),
+                        const SizedBox(height: 28),
+                        _Bascule(
+                          creation: _creation,
+                          onChange: enCours ? null : (creation) => setState(() => _creation = creation),
+                        ),
+                        const SizedBox(height: AppEspace.xl),
+                        AppChampTexte(
+                          libelle: 'Adresse e-mail',
+                          controller: _email,
+                          icone: Icons.mail_outline,
+                          indication: 'vous@exemple.com',
+                          clavier: TextInputType.emailAddress,
+                          autofill: const [AutofillHints.email],
+                          onChanged: (_) => setState(() {}),
+                        ),
+                        const SizedBox(height: 18),
+                        AppChampTexte(
+                          libelle: 'Mot de passe',
+                          controller: _motDePasse,
+                          icone: Icons.lock_outline,
+                          motDePasse: true,
+                          indication: _creation ? '8 caractères minimum' : null,
+                          autofill: [_creation ? AutofillHints.newPassword : AutofillHints.password],
+                          onSubmitted: (_) => _soumettre(),
+                          onChanged: (_) => setState(() {}),
+                        ),
+                        if (!_creation)
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: AppEspace.xs),
+                              child: AppLien(
+                                libelle: 'Mot de passe oublié ?',
+                                couleur: c.texteMoyen,
+                                onPressed: enCours
+                                    ? null
+                                    : () =>
+                                          Navigator.of(context)
+                                              .pushNamed(AppRouter.resetPasswordRoute, arguments: _email.text.trim()),
+                              ),
+                            ),
+                          ),
+                        if (state is Unauthenticated && state.erreur != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: AppEspace.m),
+                            child: _Erreur(state.erreur!),
+                          ),
+                        const SizedBox(height: AppEspace.l),
+                        AppBouton(
+                          libelle: _creation ? 'Créer mon compte' : 'Se connecter',
+                          enChargement: enCours,
+                          onPressed: _complet ? _soumettre : null,
+                        ),
+                        const SizedBox(height: AppEspace.xl),
+                        const _Separateur(),
+                        const SizedBox(height: AppEspace.xl),
+                        AppBouton(
+                          libelle: 'Découvrir sans compte',
+                          secondaire: true,
+                          onPressed: enCours ? null : () => context.read<AuthBloc>().add(ContinuerSansCompte()),
+                        ),
+                        const SizedBox(height: AppEspace.s),
+                        Text(
+                          'Démo du marché et des analyses, en lecture seule.',
+                          textAlign: TextAlign.center,
+                          style: AppTypo.style(taille: 13, couleur: c.texteFaible),
+                        ),
+                        const NotePied(kAvertissement),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -161,21 +185,25 @@ class _Marque extends StatelessWidget {
           width: 40,
           height: 40,
           decoration: BoxDecoration(color: c.encre, borderRadius: BorderRadius.circular(12)),
-          child: CustomPaint(painter: _CourbeLogo(c.surEncre, c.hausse)),
+          child: CustomPaint(painter: _CourbeLogo(c.surEncre, c.surEncre)),
         ),
         const SizedBox(width: AppEspace.m),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Financial AI Advisor',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypo.style(taille: 16, graisse: FontWeight.w700, couleur: c.texte)),
-              Text('Bourse régionale · BRVM',
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTypo.style(taille: 12, couleur: c.texteMoyen)),
+              Text(
+                'Financial AI Advisor',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypo.style(taille: 16, graisse: FontWeight.w700, couleur: c.texte),
+              ),
+              Text(
+                'Bourse régionale · BRVM',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypo.style(taille: 12, couleur: c.texteMoyen),
+              ),
             ],
           ),
         ),
@@ -222,10 +250,7 @@ class _Apercu extends StatelessWidget {
     final c = context.couleurs;
     return Container(
       padding: const EdgeInsets.fromLTRB(AppEspace.l, AppEspace.l, AppEspace.l, AppEspace.m),
-      decoration: BoxDecoration(
-        color: c.surface,
-        borderRadius: BorderRadius.circular(AppRayon.xl),
-      ),
+      decoration: BoxDecoration(color: c.surface, borderRadius: BorderRadius.circular(AppRayon.xl)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -262,9 +287,16 @@ class _Pastille extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(width: 7, height: 7, decoration: BoxDecoration(color: couleur, shape: BoxShape.circle)),
+            Container(
+              width: 7,
+              height: 7,
+              decoration: BoxDecoration(color: couleur, shape: BoxShape.circle),
+            ),
             const SizedBox(width: 6),
-            Text(signal.libelle, style: AppTypo.style(taille: 13, graisse: FontWeight.w600, couleur: couleur)),
+            Text(
+              signal.libelle,
+              style: AppTypo.style(taille: 13, graisse: FontWeight.w600, couleur: couleur),
+            ),
           ],
         ),
       ),
@@ -344,15 +376,15 @@ class _Bascule extends StatelessWidget {
               duration: const Duration(milliseconds: 180),
               padding: const EdgeInsets.symmetric(vertical: 11),
               decoration: BoxDecoration(
-                color: actif ? c.fond : Colors.transparent,
+                color: actif ? c.champ : Colors.transparent,
                 borderRadius: BorderRadius.circular(10),
-                boxShadow: actif
-                    ? [BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 6, offset: const Offset(0, 1))]
-                    : null,
+                border: Border.all(color: actif ? c.separateur : Colors.transparent),
               ),
-              child: Text(libelle,
-                  textAlign: TextAlign.center,
-                  style: AppTypo.style(taille: 15, graisse: FontWeight.w600, couleur: actif ? c.texte : c.texteMoyen)),
+              child: Text(
+                libelle,
+                textAlign: TextAlign.center,
+                style: AppTypo.style(taille: 15, graisse: FontWeight.w600, couleur: actif ? c.texte : c.texteMoyen),
+              ),
             ),
           ),
         ),
@@ -382,7 +414,9 @@ class _Erreur extends StatelessWidget {
         children: [
           Icon(Icons.error_outline, size: 18, color: c.baisse),
           const SizedBox(width: AppEspace.s),
-          Expanded(child: Text(message, style: AppTypo.style(taille: 14, couleur: c.baisse, hauteur: 1.4))),
+          Expanded(
+            child: Text(message, style: AppTypo.style(taille: 14, couleur: c.baisse, hauteur: 1.4)),
+          ),
         ],
       ),
     );

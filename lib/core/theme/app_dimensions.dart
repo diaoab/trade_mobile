@@ -12,6 +12,9 @@ class AppEspace {
 
   /// 20 — marge latérale d'un écran.
   static const double gouttiere = 20;
+
+  /// Marge latérale d'une carte de section.
+  static const double carte = 14;
   static const double xl = 24;
   static const double xxl = 28;
 }
@@ -23,6 +26,9 @@ class AppRayon {
   static const double m = 10;
   static const double l = 14;
   static const double xl = 16;
+
+  /// Carte de section.
+  static const double carte = 18;
 }
 
 /// Largeur maximale du contenu : sur tablette, une colonne lisible plutôt

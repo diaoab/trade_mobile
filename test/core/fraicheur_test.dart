@@ -30,7 +30,7 @@ void main() {
   });
 
   Widget ecran(Widget enfant) => MaterialApp(
-        theme: ThemeData(extensions: const [AppColor.clair]),
+        theme: ThemeData(extensions: const [AppColor.nuit]),
         home: Scaffold(body: enfant),
       );
 

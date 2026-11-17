@@ -64,8 +64,16 @@ class _AppChampTexteState extends State<AppChampTexte> {
             hintText: widget.indication,
             hintStyle: AppTypo.style(taille: 17, couleur: c.texteFaible),
             filled: true,
-            fillColor: c.surface,
-            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+            fillColor: c.champ,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppRayon.l),
+              borderSide: BorderSide(color: c.separateur),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppRayon.l),
+              borderSide: BorderSide(color: c.encre, width: 1.5),
+            ),
             prefixIcon: widget.icone == null ? null : Icon(widget.icone, size: 20, color: c.texteMoyen),
             suffixIcon: motDePasse
                 ? IconButton(
@@ -74,7 +82,7 @@ class _AppChampTexteState extends State<AppChampTexte> {
                     icon: Icon(_visible ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: c.texteMoyen),
                   )
                 : null,
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRayon.m), borderSide: BorderSide.none),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppRayon.l), borderSide: BorderSide.none),
           ),
         ),
       ],

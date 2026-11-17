@@ -223,7 +223,7 @@ class _ChampFraisState extends State<_ChampFrais> {
     return Container(
       height: 36,
       padding: const EdgeInsets.symmetric(horizontal: 10),
-      decoration: BoxDecoration(color: c.surface, borderRadius: BorderRadius.circular(AppRayon.s)),
+      decoration: BoxDecoration(color: c.champ, borderRadius: BorderRadius.circular(AppRayon.s)),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -197,7 +197,7 @@ class _AssistantInvite extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.couleurs;
     return Material(
-      color: c.surface,
+      color: c.champ,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),

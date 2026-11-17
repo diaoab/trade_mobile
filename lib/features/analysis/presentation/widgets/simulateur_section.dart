@@ -63,7 +63,7 @@ class _SimulateurSectionState extends State<SimulateurSection> {
               labelText: 'Montant à investir',
               suffixText: 'FCFA',
               filled: true,
-              fillColor: c.surface,
+              fillColor: c.champ,
               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
             ),
           ),

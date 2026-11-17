@@ -136,7 +136,7 @@ class _AjoutPositionState extends State<_AjoutPosition> {
                           showCheckmark: false,
                           onSelected: (_) => setState(() => _symbol = titre.symbol),
                           labelStyle: AppTypo.style(taille: 15, graisse: FontWeight.w500, couleur: choisi ? c.surEncre : c.texte),
-                          backgroundColor: c.surface,
+                          backgroundColor: c.champ,
                           selectedColor: c.encre,
                           side: BorderSide.none,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRayon.m)),
@@ -178,7 +178,7 @@ class _AjoutPositionState extends State<_AjoutPosition> {
                       borderRadius: BorderRadius.circular(AppRayon.m),
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                        decoration: BoxDecoration(color: c.surface, borderRadius: BorderRadius.circular(AppRayon.m)),
+                        decoration: BoxDecoration(color: c.champ, borderRadius: BorderRadius.circular(AppRayon.m)),
                         child: Row(children: [
                           Expanded(
                             child: Text(DateFormat('d MMMM y', 'fr_FR').format(_date),

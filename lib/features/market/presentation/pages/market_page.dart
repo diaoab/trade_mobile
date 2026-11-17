@@ -54,6 +54,7 @@ class MarketPage extends StatelessWidget {
             if (state is MarketLoaded) ...[
               if (estInvite(context)) const BandeauDemo(),
               BandeauCoursAnciens(date: derniere),
+              if (state.titres.isNotEmpty) _Repartition(titres: state.titres),
               if (state.titres.isNotEmpty)
                 BlocBuilder<PortfolioBloc, PortfolioState>(
                   builder: (context, portefeuille) => ResumeDuJourCarte(
@@ -64,7 +65,6 @@ class MarketPage extends StatelessWidget {
                     ),
                   ),
                 ),
-              if (state.titres.isNotEmpty) _Repartition(titres: state.titres),
               BlocBuilder<FavoritesBloc, FavoritesState>(
                 builder: (context, favoris) => _ListesTitres(titres: state.titres, favoris: favoris.symboles),
               ),
@@ -78,7 +78,8 @@ class MarketPage extends StatelessWidget {
   }
 }
 
-/// Répartition des signaux : barre achat / conserver / vente.
+/// Répartition des signaux : un compteur coloré par signal et la barre
+/// achat / conserver / vente, sur une carte.
 class _Repartition extends StatelessWidget {
   final List<MarketEntry> titres;
   const _Repartition({required this.titres});
@@ -87,16 +88,41 @@ class _Repartition extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.couleurs;
     final comptes = {for (final s in Signal.values) s: titres.where((t) => t.decision == s.code).length};
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(AppEspace.gouttiere, AppEspace.m, AppEspace.gouttiere, 0),
+    return Container(
+      margin: const EdgeInsets.fromLTRB(AppEspace.carte, AppEspace.l, AppEspace.carte, 0),
+      padding: const EdgeInsets.all(AppEspace.l),
+      decoration: BoxDecoration(
+        color: c.surface,
+        borderRadius: BorderRadius.circular(AppRayon.carte),
+        border: Border.all(color: c.separateur.withValues(alpha: 0.6), width: 0.6),
+      ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          Text('SIGNAUX DU MOTEUR',
+              style: AppTypo.style(taille: 12, graisse: FontWeight.w700, couleur: c.texteMoyen, interlettre: 0.8)),
+          const SizedBox(height: AppEspace.m),
+          Row(
+            children: [
+              for (final s in Signal.values)
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('${comptes[s]}',
+                          style: AppTypo.style(taille: 28, graisse: FontWeight.w700, couleur: s.couleur(c), tabulaire: true)),
+                      Text(s.libelle, style: AppTypo.style(taille: 13, couleur: c.texteMoyen)),
+                    ],
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: AppEspace.m),
           ClipRRect(
-            borderRadius: BorderRadius.circular(3),
+            borderRadius: BorderRadius.circular(4),
             child: Container(
-              height: 6,
-              color: c.surface,
+              height: 8,
+              color: c.champ,
               child: Row(
                 children: [
                   for (final s in Signal.values)
@@ -108,19 +134,6 @@ class _Repartition extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-          const SizedBox(height: AppEspace.s),
-          Wrap(
-            spacing: AppEspace.l,
-            children: [
-              for (final s in Signal.values)
-                Text.rich(TextSpan(children: [
-                  TextSpan(
-                      text: '${comptes[s]} ',
-                      style: AppTypo.style(taille: 13, graisse: FontWeight.w600, couleur: c.texte, tabulaire: true)),
-                  TextSpan(text: s.libelle.toLowerCase(), style: AppTypo.style(taille: 13, couleur: c.texteMoyen)),
-                ])),
-            ],
           ),
         ],
       ),

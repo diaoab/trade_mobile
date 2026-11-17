@@ -40,15 +40,18 @@ class ChangePill extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.couleurs;
     final v = valeur;
-    final fond = v == null || v == 0 ? c.surface : (v > 0 ? c.hausse : c.baisse);
+    final couleur = c.variation(v);
+    final neutre = v == null || v == 0;
     return Container(
       constraints: const BoxConstraints(minWidth: 76),
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(color: fond, borderRadius: BorderRadius.circular(6)),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+      decoration: BoxDecoration(
+        color: neutre ? c.champ : couleur.withValues(alpha: 0.14),
+        borderRadius: BorderRadius.circular(8),
+      ),
       child: Text(Format.pourcentage(v),
           textAlign: TextAlign.right,
-          style: AppTypo.style(
-              taille: 14, graisse: FontWeight.w600, couleur: v == null || v == 0 ? c.texteMoyen : Colors.white, tabulaire: true)),
+          style: AppTypo.style(taille: 14, graisse: FontWeight.w700, couleur: couleur, tabulaire: true)),
     );
   }
 }
@@ -136,7 +139,7 @@ class Segmente<T> extends StatelessWidget {
                   height: 30,
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
-                    color: option == valeur ? c.fond : Colors.transparent,
+                    color: option == valeur ? c.champ : Colors.transparent,
                     borderRadius: BorderRadius.circular(AppRayon.s - 1),
                   ),
                   child: Text(libelle(option),

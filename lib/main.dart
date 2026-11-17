@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -47,8 +48,8 @@ class _MyAppState extends State<MyApp> {
         navigatorKey: _navigatorKey,
         debugShowCheckedModeBanner: false,
         title: 'Financial AI Advisor',
-        theme: AppTheme.light(),
-        darkTheme: AppTheme.dark(),
+        theme: AppTheme.theme(),
+        themeMode: ThemeMode.dark,
         locale: const Locale('fr', 'FR'),
         supportedLocales: const [Locale('fr', 'FR')],
         localizationsDelegates: const [
@@ -66,9 +67,13 @@ class _MyAppState extends State<MyApp> {
               final route = state is Authenticated || state is Invite ? AppRouter.homeRoute : AppRouter.loginRoute;
               _navigatorKey.currentState?.pushNamedAndRemoveUntil(route, (_) => false);
             },
-            child: MediaQuery(
-              data: mq.copyWith(textScaler: mq.textScaler.clamp(maxScaleFactor: 1.5)),
-              child: child!,
+            // Fond sombre partout : icônes de la barre d'état en clair.
+            child: AnnotatedRegion<SystemUiOverlayStyle>(
+              value: SystemUiOverlayStyle.light,
+              child: MediaQuery(
+                data: mq.copyWith(textScaler: mq.textScaler.clamp(maxScaleFactor: 1.5)),
+                child: child!,
+              ),
             ),
           );
         },

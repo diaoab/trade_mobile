@@ -2,17 +2,28 @@ import 'package:flutter/material.dart';
 
 /// app_color.dart — Jetons de couleur, nommés par rôle.
 ///
-/// Palette neutre : l'encre et le papier portent l'interface, la couleur est
-/// réservée à ce qui a un sens financier (hausse, baisse, signal).
+/// Style « fintech sombre » : fond bleu nuit, cartes plus claires pour la
+/// profondeur, un accent turquoise pour l'action, et des couleurs vives
+/// réservées à ce qui a un sens financier (hausse, baisse, prudence).
 @immutable
 class AppColor extends ThemeExtension<AppColor> {
+  /// Fond de l'écran.
   final Color fond;
+
+  /// Cartes, sections, pastilles.
   final Color surface;
+
+  /// Fond des champs de saisie, posés sur une carte.
+  final Color champ;
   final Color separateur;
   final Color texte;
   final Color texteMoyen;
   final Color texteFaible;
+
+  /// Couleur d'action (boutons principaux, éléments actifs).
   final Color encre;
+
+  /// Texte posé sur [encre].
   final Color surEncre;
   final Color hausse;
   final Color baisse;
@@ -24,6 +35,7 @@ class AppColor extends ThemeExtension<AppColor> {
   const AppColor({
     required this.fond,
     required this.surface,
+    required this.champ,
     required this.separateur,
     required this.texte,
     required this.texteMoyen,
@@ -38,39 +50,22 @@ class AppColor extends ThemeExtension<AppColor> {
     required this.bande,
   });
 
-  /// Ivoire : papier chaud façon presse financière plutôt que blanc pur.
-  static const clair = AppColor(
-    fond: Color(0xFFF4EFE4),
-    surface: Color(0xFFEAE4D6),
-    separateur: Color(0xFFDDD5C3),
-    texte: Color(0xFF1C1B17),
-    texteMoyen: Color(0xFF6F6A5D),
-    texteFaible: Color(0xFFA39E8F),
-    encre: Color(0xFF1C1B17),
-    surEncre: Color(0xFFF4EFE4),
-    hausse: Color(0xFF0A7F50),
-    baisse: Color(0xFFC42B36),
-    prudence: Color(0xFF9A5D0A),
-    serie1: Color(0xFF2F5FB3),
-    serie2: Color(0xFFB06D0E),
-    bande: Color(0x0F1C1B17),
-  );
-
-  static const sombre = AppColor(
-    fond: Color(0xFF000000),
-    surface: Color(0xFF151516),
-    separateur: Color(0xFF262628),
-    texte: Color(0xFFF5F5F4),
-    texteMoyen: Color(0xFF9C9B97),
-    texteFaible: Color(0xFF646360),
-    encre: Color(0xFFF5F5F4),
-    surEncre: Color(0xFF000000),
-    hausse: Color(0xFF2DBE7E),
-    baisse: Color(0xFFF2545F),
-    prudence: Color(0xFFE2A23B),
-    serie1: Color(0xFF5B8DEF),
-    serie2: Color(0xFFE09A3A),
-    bande: Color(0x0FF5F5F4),
+  static const nuit = AppColor(
+    fond: Color(0xFF0A0F1C),
+    surface: Color(0xFF121A2B),
+    champ: Color(0xFF1A2438),
+    separateur: Color(0xFF232F47),
+    texte: Color(0xFFF1F5F9),
+    texteMoyen: Color(0xFF94A3B8),
+    texteFaible: Color(0xFF5E6B82),
+    encre: Color(0xFF2DD4BF),
+    surEncre: Color(0xFF04201C),
+    hausse: Color(0xFF34D399),
+    baisse: Color(0xFFFB7185),
+    prudence: Color(0xFFFBBF24),
+    serie1: Color(0xFF60A5FA),
+    serie2: Color(0xFFF59E0B),
+    bande: Color(0x14FFFFFF),
   );
 
   /// Couleur d'une variation : neutre à zéro, verte en hausse, rouge en baisse.
