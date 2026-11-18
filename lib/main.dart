@@ -27,6 +27,9 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 
+/// Compte connecté avec un mot de passe provisoire à remplacer.
+bool _provisoire(AuthState s) => s is Authenticated && s.user.doitChangerMotDePasse;
+
 class _MyAppState extends State<MyApp> {
   final _navigatorKey = AppRouter.navigatorKey;
 
@@ -61,10 +64,15 @@ class _MyAppState extends State<MyApp> {
         builder: (context, child) {
           final mq = MediaQuery.of(context);
           return BlocListener<AuthBloc, AuthState>(
-            listenWhen: (avant, apres) => avant.runtimeType != apres.runtimeType && apres is! AuthLoading,
+            listenWhen: (avant, apres) =>
+                apres is! AuthLoading && (avant.runtimeType != apres.runtimeType || _provisoire(avant) != _provisoire(apres)),
             listener: (context, state) {
               di.sl<FavoritesBloc>().add(state is Authenticated ? LoadFavoris() : ViderFavoris());
-              final route = state is Authenticated || state is Invite ? AppRouter.homeRoute : AppRouter.loginRoute;
+              final route = _provisoire(state)
+                  ? AppRouter.motDePasseProvisoireRoute
+                  : state is Authenticated || state is Invite
+                      ? AppRouter.homeRoute
+                      : AppRouter.loginRoute;
               _navigatorKey.currentState?.pushNamedAndRemoveUntil(route, (_) => false);
             },
             // Fond sombre partout : icônes de la barre d'état en clair.

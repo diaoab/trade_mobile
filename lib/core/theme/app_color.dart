@@ -50,21 +50,23 @@ class AppColor extends ThemeExtension<AppColor> {
     required this.bande,
   });
 
+  /// Palette inspirée de Sika Finance : bleu nuit (#1A2634), orange
+  /// (#F8B133) en accent, vert et rouge francs pour les variations.
   static const nuit = AppColor(
-    fond: Color(0xFF0A0F1C),
-    surface: Color(0xFF121A2B),
-    champ: Color(0xFF1A2438),
-    separateur: Color(0xFF232F47),
-    texte: Color(0xFFF1F5F9),
-    texteMoyen: Color(0xFF94A3B8),
-    texteFaible: Color(0xFF5E6B82),
-    encre: Color(0xFF2DD4BF),
-    surEncre: Color(0xFF04201C),
-    hausse: Color(0xFF34D399),
-    baisse: Color(0xFFFB7185),
-    prudence: Color(0xFFFBBF24),
-    serie1: Color(0xFF60A5FA),
-    serie2: Color(0xFFF59E0B),
+    fond: Color(0xFF0F1823),
+    surface: Color(0xFF1A2634),
+    champ: Color(0xFF233244),
+    separateur: Color(0xFF2E4055),
+    texte: Color(0xFFF5F7FA),
+    texteMoyen: Color(0xFFA3B0C0),
+    texteFaible: Color(0xFF6B7A8C),
+    encre: Color(0xFFF8B133),
+    surEncre: Color(0xFF231703),
+    hausse: Color(0xFF2ECC55),
+    baisse: Color(0xFFF2434E),
+    prudence: Color(0xFFFFD45C),
+    serie1: Color(0xFF5DA9F6),
+    serie2: Color(0xFFF8B133),
     bande: Color(0x14FFFFFF),
   );
 

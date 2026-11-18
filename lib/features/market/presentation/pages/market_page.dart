@@ -7,6 +7,7 @@ import '../../../../core/theme/app_color.dart';
 import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_typo.dart';
 import '../../../../core/utils/format.dart';
+import '../../../../core/utils/fraicheur.dart';
 import '../../../../core/widgets/app_ecran.dart';
 import '../../../../core/widgets/app_section.dart';
 import '../../../../core/widgets/bandeau_cours_anciens.dart';
@@ -32,7 +33,10 @@ class MarketPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<MarketBloc, MarketState>(
+    return BlocConsumer<MarketBloc, MarketState>(
+      listenWhen: (_, apres) => apres is MarketLoaded && apres.message != null,
+      listener: (context, state) => ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text((state as MarketLoaded).message!))),
       builder: (context, state) {
         final bloc = context.read<MarketBloc>();
         final derniere = state is MarketLoaded ? state.derniereSeance : null;
@@ -53,7 +57,19 @@ class MarketPage extends StatelessWidget {
             if (state is MarketLoading || state is MarketInitial) const Chargement(),
             if (state is MarketLoaded) ...[
               if (estInvite(context)) const BandeauDemo(),
-              BandeauCoursAnciens(date: derniere),
+              BandeauCoursAnciens(
+                date: derniere,
+                onRecuperer: estInvite(context) ? null : () => bloc.add(RecupererCoursDuJour()),
+                recuperation: state.recuperation,
+              ),
+              if (!estInvite(context) && !Fraicheur.estAncienne(derniere))
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(AppEspace.gouttiere, AppEspace.s, AppEspace.gouttiere, 0),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: BoutonCoursDuJour(onPressed: () => bloc.add(RecupererCoursDuJour()), enCours: state.recuperation),
+                  ),
+                ),
               if (state.titres.isNotEmpty) _Repartition(titres: state.titres),
               if (state.titres.isNotEmpty)
                 BlocBuilder<PortfolioBloc, PortfolioState>(

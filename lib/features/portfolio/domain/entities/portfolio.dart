@@ -98,14 +98,14 @@ class Portfolio extends Equatable {
 }
 
 /// Saisie d'une nouvelle position.
+/// Achat à enregistrer : le titre et la quantité. Le serveur fixe le prix
+/// (cours actuel) et la date (aujourd'hui).
 class NouvellePosition extends Equatable {
   final String symbol;
   final double quantite;
-  final double prixAchat;
-  final DateTime dateAchat;
 
-  const NouvellePosition({required this.symbol, required this.quantite, required this.prixAchat, required this.dateAchat});
+  const NouvellePosition({required this.symbol, required this.quantite});
 
   @override
-  List<Object?> get props => [symbol, quantite, prixAchat, dateAchat];
+  List<Object?> get props => [symbol, quantite];
 }

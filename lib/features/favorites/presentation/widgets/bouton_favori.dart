@@ -14,7 +14,11 @@ class BoutonFavori extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.couleurs;
-    return BlocBuilder<FavoritesBloc, FavoritesState>(
+    return BlocConsumer<FavoritesBloc, FavoritesState>(
+      // Refus de l'API (limite de l'offre gratuite…) : message.
+      listenWhen: (a, b) => b.erreur != null && a.erreur != b.erreur,
+      listener: (context, state) =>
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(state.erreur!))),
       buildWhen: (a, b) => a.contient(symbol) != b.contient(symbol),
       builder: (context, state) {
         final suivi = state.contient(symbol);

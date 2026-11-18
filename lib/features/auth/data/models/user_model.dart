@@ -17,6 +17,8 @@ class UserModel extends User {
     required super.plan,
     super.proJusquau,
     required super.assistant,
+    super.doitChangerMotDePasse,
+    super.limites,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
@@ -28,6 +30,10 @@ class UserModel extends User {
         plan: json['plan'] as String,
         proJusquau: json['pro_until'] as String?,
         assistant: QuotaModel.fromJson(json['assistant'] as Map<String, dynamic>),
+        doitChangerMotDePasse: json['must_change_password'] == true,
+        limites: json['limits'] is Map
+            ? Limites(positions: json['limits']['positions'] as int?, favoris: json['limits']['favorites'] as int?)
+            : const Limites(),
       );
 }
 

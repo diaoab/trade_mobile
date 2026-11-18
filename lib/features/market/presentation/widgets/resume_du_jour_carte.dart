@@ -141,14 +141,20 @@ class _LigneBascule extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = context.couleurs;
+    final apres = bascule.apres;
+    final (icone, couleur, titre) = switch (apres) {
+      'ACHETER' => (Icons.trending_up_rounded, c.hausse, 'Moment d’acheter ${bascule.nom}'),
+      'VENDRE' => (Icons.trending_down_rounded, c.baisse, 'Moment de vendre ${bascule.nom}'),
+      _ => (Icons.swap_vert, c.texte, '${bascule.nom} passe à « Conserver »'),
+    };
     return _Ligne(
-      icone: Icons.swap_vert,
-      couleurIcone: c.texte,
+      icone: icone,
+      couleurIcone: couleur,
       onTap: () => Navigator.of(context).pushNamed(AppRouter.analyseRoute, arguments: bascule.symbol),
       contenu: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('${bascule.nom} change de signal',
+          Text(titre,
               style: AppTypo.style(taille: 15, graisse: FontWeight.w600, couleur: c.texte)),
           const SizedBox(height: 4),
           Wrap(

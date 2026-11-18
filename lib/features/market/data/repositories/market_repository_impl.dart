@@ -15,4 +15,7 @@ class MarketRepositoryImpl implements MarketRepository {
 
   @override
   Future<Either<Failure, List<MarketEntry>>> getStructures() => appelApi(remoteDataSource.getStructures);
+
+  @override
+  Future<Either<Failure, String?>> rafraichirCours() => appelApi(remoteDataSource.rafraichirCours);
 }

@@ -67,6 +67,7 @@ import 'features/market/data/repositories/market_repository_impl.dart';
 import 'features/market/domain/repositories/market_repository.dart';
 import 'features/market/domain/usecases/get_market.dart';
 import 'features/market/domain/usecases/get_structures.dart';
+import 'features/market/domain/usecases/rafraichir_cours.dart';
 import 'features/market/presentation/bloc/market_bloc.dart';
 
 // Portfolio
@@ -130,7 +131,8 @@ Future<void> init() async {
   sl.registerLazySingleton<MarketRepository>(() => MarketRepositoryImpl(remoteDataSource: sl()));
   sl.registerLazySingleton(() => GetMarket(sl()));
   sl.registerLazySingleton(() => GetStructures(sl()));
-  sl.registerFactory(() => MarketBloc(getMarket: sl()));
+  sl.registerLazySingleton(() => RafraichirCours(sl()));
+  sl.registerFactory(() => MarketBloc(getMarket: sl(), rafraichirCours: sl()));
 
   //================================================
   // FAVORIS (partagés par toute l'app : un seul bloc)

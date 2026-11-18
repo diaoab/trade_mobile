@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 
 import '../../../market/data/models/market_entry_model.dart';
 import '../../domain/entities/portfolio.dart';
@@ -52,7 +51,5 @@ extension NouvellePositionJson on NouvellePosition {
   Map<String, dynamic> toJson() => {
         'symbol': symbol,
         'quantity': quantite,
-        'buy_price': prixAchat,
-        'buy_date': DateFormat('yyyy-MM-dd').format(dateAchat),
       };
 }

@@ -10,6 +10,10 @@ abstract class MarketRemoteDataSource {
 
   /// Titres disponibles (sans calcul du signal), pour les listes de choix.
   Future<List<MarketEntryModel>> getStructures();
+
+  /// Récupère les cours du jour (Sika Finance) : date de la dernière séance
+  /// connue ensuite.
+  Future<String?> rafraichirCours();
 }
 
 class MarketRemoteDataSourceImpl implements MarketRemoteDataSource {
@@ -25,4 +29,8 @@ class MarketRemoteDataSourceImpl implements MarketRemoteDataSource {
 
   @override
   Future<List<MarketEntryModel>> getStructures() async => _liste(await dio.get(Env.structures));
+
+  @override
+  Future<String?> rafraichirCours() async =>
+      donnees<Map<String, dynamic>>(await dio.post(Env.marketRefresh))['date'] as String?;
 }

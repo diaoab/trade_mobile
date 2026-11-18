@@ -55,7 +55,8 @@ class _AlertsPageState extends State<AlertsPage> {
               const EtatVide(
                 icone: Icons.notifications_none,
                 titre: 'Aucune alerte',
-                texte: 'Vous serez prévenu ici quand un signal change ou qu’un dividende de vos titres approche.',
+                texte: 'Vous serez prévenu ici quand c’est le moment d’acheter ou de vendre, ou qu’un dividende de vos titres approche. '
+                    'Réglages dans Compte › Notifications.',
               ),
             if (state is AlertsLoaded && state.alertes.liste.isNotEmpty)
               AppSection(
@@ -68,7 +69,7 @@ class _AlertsPageState extends State<AlertsPage> {
                     ),
                 ],
               ),
-            const NotePied('Changements de signal des 10 dernières séances, sur vos favoris et les titres de votre '
+            const NotePied('Passages à « Acheter » ou à « Vendre » des 10 dernières séances, sur vos favoris et les titres de votre '
                 'portefeuille (sur tous les titres tant que vous n’en avez pas). '
                 'Dividendes : titres de votre portefeuille, dans les 7 jours avant la date butoir d’achat.'),
           ],
@@ -89,6 +90,8 @@ class _LigneAlerte extends StatelessWidget {
   Widget build(BuildContext context) {
     final c = context.couleurs;
     final signal = alerte.type == TypeAlerte.signal;
+    final achat = alerte.apres == 'ACHETER';
+    final teinte = !signal ? c.prudence : (achat ? c.hausse : c.baisse);
     return AppLigne(
       derniere: derniere,
       onTap: () => Navigator.of(context).pushNamed(AppRouter.analyseRoute, arguments: alerte.symbol),
@@ -96,7 +99,8 @@ class _LigneAlerte extends StatelessWidget {
         Stack(
           clipBehavior: Clip.none,
           children: [
-            Icon(signal ? Icons.swap_vert : Icons.event_outlined, size: 22, color: signal ? c.texte : c.prudence),
+            Icon(signal ? (achat ? Icons.trending_up_rounded : Icons.trending_down_rounded) : Icons.event_outlined,
+                size: 22, color: teinte),
             if (nouvelle)
               Positioned(
                 left: -12,
@@ -110,7 +114,9 @@ class _LigneAlerte extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                signal ? '${alerte.nom} change de signal' : 'Dividende ${alerte.nom}',
+                signal
+                    ? (achat ? 'Moment d’acheter ${alerte.nom}' : 'Moment de vendre ${alerte.nom}')
+                    : 'Dividende ${alerte.nom}',
                 style: AppTypo.style(taille: 15, graisse: nouvelle ? FontWeight.w700 : FontWeight.w600, couleur: c.texte),
               ),
               const SizedBox(height: 4),

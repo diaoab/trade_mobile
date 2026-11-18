@@ -8,7 +8,14 @@ class MarketLoading extends MarketState {}
 
 class MarketLoaded extends MarketState {
   final List<MarketEntry> titres;
-  MarketLoaded(this.titres);
+
+  /// Récupération des cours du jour en cours.
+  final bool recuperation;
+
+  /// Résultat de la dernière récupération (succès ou erreur), à afficher une fois.
+  final String? message;
+
+  MarketLoaded(this.titres, {this.recuperation = false, this.message});
 
   /// Dernière séance connue parmi les titres.
   String? get derniereSeance {

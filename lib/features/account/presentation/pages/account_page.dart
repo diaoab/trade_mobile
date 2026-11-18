@@ -10,6 +10,7 @@ import '../../../../core/widgets/app_ecran.dart';
 import '../../../../core/widgets/app_section.dart';
 import '../../../../core/widgets/confirmation_dialog.dart';
 import '../../../../core/widgets/etats.dart';
+import '../../../alerts/presentation/bloc/alerts_bloc.dart';
 import '../../../auth/presentation/bloc/auth_bloc.dart';
 import '../../../auth/presentation/bloc/auth_event.dart';
 import '../../../auth/presentation/bloc/auth_state.dart';
@@ -107,7 +108,40 @@ class AccountPage extends StatelessWidget {
     final c = context.couleurs;
     final bloc = context.read<AccountBloc>();
     void modifier(ModificationPreferences m) => bloc.add(PreferencesChanged(m));
+    final n = prefs.notifications;
+    void notif(String cle, bool v) {
+      final alertes = context.read<AlertsBloc>();
+      modifier(ModificationPreferences(notifications: {cle: v}));
+      // La pastille de la cloche suit le réglage, une fois celui-ci enregistré.
+      bloc.stream
+          .firstWhere((s) => s.preferences?.notifications != n || s.erreur != null)
+          .timeout(const Duration(seconds: 15))
+          .then((_) => alertes.add(LoadAlertes()), onError: (_) {});
+    }
+
+    Widget interrupteur(String titre, String aide, bool valeur, ValueChanged<bool>? onChanged, {bool derniere = false}) =>
+        AppLigne(
+          derniere: derniere,
+          enfants: [
+            Expanded(child: _Libelle(titre: titre, aide: aide)),
+            Switch.adaptive(value: valeur, onChanged: onChanged),
+          ],
+        );
     return [
+      AppSection(
+        titre: 'Notifications',
+        enfants: [
+          interrupteur('Activer les notifications', 'Pastille sur la cloche et, bientôt, notifications sur le téléphone.',
+              n.actives, (v) => notif('enabled', v)),
+          interrupteur('Moments d’acheter', 'Quand le signal d’un titre suivi passe à « Acheter ».', n.achat,
+              n.actives ? (v) => notif('buy', v) : null),
+          interrupteur('Moments de vendre', 'Quand le signal d’un titre suivi ou détenu passe à « Vendre ».', n.vente,
+              n.actives ? (v) => notif('sell', v) : null),
+          interrupteur('Dividendes', 'Date butoir proche pour un titre détenu.', n.dividende,
+              n.actives ? (v) => notif('dividend', v) : null,
+              derniere: true),
+        ],
+      ),
       AppSection(
         titre: 'Indicateurs du signal',
         enfants: [

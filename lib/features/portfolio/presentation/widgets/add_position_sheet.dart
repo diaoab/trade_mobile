@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/utils/fraicheur.dart';
+
 import '../../../../core/theme/app_color.dart';
 import '../../../../core/theme/app_dimensions.dart';
 import '../../../../core/theme/app_typo.dart';
@@ -11,7 +13,7 @@ import '../../../../core/widgets/app_champ_texte.dart';
 import '../../../../core/widgets/etats.dart';
 import '../../../../injection_container.dart';
 import '../../../market/domain/entities/market_entry.dart';
-import '../../../market/domain/usecases/get_structures.dart';
+import '../../../market/domain/usecases/get_market.dart';
 import '../../domain/entities/portfolio.dart';
 import '../bloc/portfolio_bloc.dart';
 import '../bloc/portfolio_event.dart';
@@ -39,11 +41,9 @@ class _AjoutPosition extends StatefulWidget {
 
 class _AjoutPositionState extends State<_AjoutPosition> {
   final _quantite = TextEditingController();
-  final _prix = TextEditingController();
   late final Future<List<MarketEntry>> _titres;
   late final int _ajoutsAvant;
-  String? _symbol;
-  DateTime _date = DateTime.now();
+  MarketEntry? _titre;
   bool _envoi = false;
 
   @override
@@ -51,38 +51,24 @@ class _AjoutPositionState extends State<_AjoutPosition> {
     super.initState();
     final etat = context.read<PortfolioBloc>().state;
     _ajoutsAvant = etat is PortfolioLoaded ? etat.ajouts : 0;
-    _titres = sl<GetStructures>()().then((r) => r.fold((f) => throw f.errorMessage, (t) => t));
+    _titres = sl<GetMarket>()().then((r) => r.fold((f) => throw f.errorMessage, (t) => t));
   }
 
   @override
   void dispose() {
     _quantite.dispose();
-    _prix.dispose();
     super.dispose();
   }
 
-  bool get _complet =>
-      _symbol != null && (Format.lireNombre(_quantite.text) ?? 0) > 0 && (Format.lireNombre(_prix.text) ?? 0) > 0;
+  double get _nombre => Format.lireNombre(_quantite.text) ?? 0;
 
+  bool get _complet => _titre != null && _nombre > 0;
+
+  /// Achat au cours actuel, date du jour : ni le prix ni la date ne se
+  /// saisissent (le serveur les fixe).
   void _ajouter() {
     setState(() => _envoi = true);
-    context.read<PortfolioBloc>().add(PositionAdded(NouvellePosition(
-          symbol: _symbol!,
-          quantite: Format.lireNombre(_quantite.text)!,
-          prixAchat: Format.lireNombre(_prix.text)!,
-          dateAchat: _date,
-        )));
-  }
-
-  Future<void> _choisirDate() async {
-    final choix = await showDatePicker(
-      context: context,
-      initialDate: _date,
-      firstDate: DateTime(2000),
-      lastDate: DateTime.now(),
-      locale: const Locale('fr', 'FR'),
-    );
-    if (choix != null) setState(() => _date = choix);
+    context.read<PortfolioBloc>().add(PositionAdded(NouvellePosition(symbol: _titre!.symbol, quantite: _nombre)));
   }
 
   @override
@@ -129,12 +115,12 @@ class _AjoutPositionState extends State<_AjoutPosition> {
                       separatorBuilder: (_, _) => const SizedBox(width: AppEspace.s),
                       itemBuilder: (context, i) {
                         final titre = snap.data![i];
-                        final choisi = titre.symbol == _symbol;
+                        final choisi = titre.symbol == _titre?.symbol;
                         return ChoiceChip(
                           label: Text(titre.nom),
                           selected: choisi,
                           showCheckmark: false,
-                          onSelected: (_) => setState(() => _symbol = titre.symbol),
+                          onSelected: (_) => setState(() => _titre = titre),
                           labelStyle: AppTypo.style(taille: 15, graisse: FontWeight.w500, couleur: choisi ? c.surEncre : c.texte),
                           backgroundColor: c.champ,
                           selectedColor: c.encre,
@@ -151,43 +137,14 @@ class _AjoutPositionState extends State<_AjoutPosition> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(children: [
-                      Expanded(
-                        child: AppChampTexte(
-                          libelle: 'Quantité',
-                          controller: _quantite,
-                          clavier: const TextInputType.numberWithOptions(decimal: true),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                      ),
-                      const SizedBox(width: AppEspace.m),
-                      Expanded(
-                        child: AppChampTexte(
-                          libelle: 'Prix d’achat (FCFA)',
-                          controller: _prix,
-                          clavier: const TextInputType.numberWithOptions(decimal: true),
-                          onChanged: (_) => setState(() {}),
-                        ),
-                      ),
-                    ]),
-                    const SizedBox(height: AppEspace.l),
-                    Text('Date d’achat', style: AppTypo.style(taille: 13, graisse: FontWeight.w500, couleur: c.texteMoyen)),
-                    const SizedBox(height: AppEspace.s),
-                    InkWell(
-                      onTap: _choisirDate,
-                      borderRadius: BorderRadius.circular(AppRayon.m),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                        decoration: BoxDecoration(color: c.champ, borderRadius: BorderRadius.circular(AppRayon.m)),
-                        child: Row(children: [
-                          Expanded(
-                            child: Text(DateFormat('d MMMM y', 'fr_FR').format(_date),
-                                style: AppTypo.style(taille: 17, couleur: c.texte)),
-                          ),
-                          Icon(Icons.event_outlined, size: 18, color: c.texteMoyen),
-                        ]),
-                      ),
+                    AppChampTexte(
+                      libelle: 'Quantité',
+                      controller: _quantite,
+                      clavier: const TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (_) => setState(() {}),
                     ),
+                    const SizedBox(height: AppEspace.l),
+                    _CoursFixe(titre: _titre, quantite: _nombre),
                   ],
                 ),
               ),
@@ -202,6 +159,60 @@ class _AjoutPositionState extends State<_AjoutPosition> {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Cours et date de l'achat, en lecture seule : on achète au cours actuel,
+/// aujourd'hui.
+class _CoursFixe extends StatelessWidget {
+  final MarketEntry? titre;
+  final double quantite;
+  const _CoursFixe({required this.titre, required this.quantite});
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.couleurs;
+    final t = titre;
+    Widget ligne(String libelle, String valeur, {bool fort = false}) => Padding(
+          padding: const EdgeInsets.symmetric(vertical: 6),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(libelle, style: AppTypo.style(taille: 15, couleur: c.texteMoyen)),
+            const SizedBox(width: AppEspace.m),
+            Expanded(
+              child: Text(valeur,
+                  textAlign: TextAlign.right,
+                  style: AppTypo.style(
+                      taille: fort ? 17 : 15, graisse: fort ? FontWeight.w700 : FontWeight.w600, couleur: c.texte, tabulaire: true)),
+            ),
+          ]),
+        );
+    final ancien = t != null && Fraicheur.estAncienne(t.date);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(color: c.champ, borderRadius: BorderRadius.circular(AppRayon.m)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          ligne('Cours actuel', t == null ? '—' : '${Format.nombre(t.cours)} FCFA'),
+          ligne('Date d’achat', 'Aujourd’hui, ${DateFormat('d MMM y', 'fr_FR').format(DateTime.now())}'),
+          if (t != null && quantite > 0) ligne('Montant (hors frais)', '${Format.nombre(t.cours * quantite)} FCFA', fort: true),
+          const SizedBox(height: 4),
+          Row(children: [
+            Icon(Icons.lock_outline, size: 14, color: c.texteFaible),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                ancien
+                    ? 'Dernier cours connu : ${Format.date(t.date)}. Le cours du jour sera cherché à l’achat ; '
+                        'sans lui, l’achat sera refusé.'
+                    : 'L’achat se fait au cours actuel et à la date du jour.',
+                style: AppTypo.style(taille: 12, couleur: ancien ? c.prudence : c.texteFaible),
+              ),
+            ),
+          ]),
+        ],
       ),
     );
   }

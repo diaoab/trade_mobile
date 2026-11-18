@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../features/analysis/presentation/pages/analysis_page.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/auth/presentation/pages/mot_de_passe_provisoire_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/splash/presentation/pages/splash_screen.dart';
@@ -17,6 +18,9 @@ class AppRouter {
   static const String loginRoute = '/login';
   static const String homeRoute = '/home';
 
+  /// Première connexion avec un mot de passe provisoire.
+  static const String motDePasseProvisoireRoute = '/mot-de-passe-provisoire';
+
   /// Argument facultatif : adresse déjà saisie (String).
   static const String resetPasswordRoute = '/mot-de-passe-oublie';
 
@@ -29,6 +33,8 @@ class AppRouter {
         return _sansAnimation(settings, const LoginPage());
       case resetPasswordRoute:
         return MaterialPageRoute(settings: settings, builder: (_) => ResetPasswordPage(email: settings.arguments as String? ?? ''));
+      case motDePasseProvisoireRoute:
+        return _sansAnimation(settings, const MotDePasseProvisoirePage());
       case homeRoute:
         return _sansAnimation(settings, const HomePage());
       case analyseRoute:

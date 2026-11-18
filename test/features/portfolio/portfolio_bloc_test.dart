@@ -15,7 +15,7 @@ import 'package:mocktail/mocktail.dart';
 class _Repo extends Mock implements PortfolioRepository {}
 
 const _vide = Portfolio(positions: [], totaux: TotauxPortefeuille(cout: 0, valeur: 0, dividendes: 0, frais: 0, net: 0));
-final _saisie = NouvellePosition(symbol: 'PALM_CI', quantite: 10, prixAchat: 7000, dateAchat: DateTime(2026, 1, 5));
+final _saisie = NouvellePosition(symbol: 'PALM_CI', quantite: 10);
 
 void main() {
   late _Repo repo;

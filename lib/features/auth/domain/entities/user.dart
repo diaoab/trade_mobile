@@ -11,6 +11,17 @@ class Quota extends Equatable {
   List<Object?> get props => [utilisees, limite];
 }
 
+/// Limites de l'offre (null : sans limite).
+class Limites extends Equatable {
+  final int? positions;
+  final int? favoris;
+
+  const Limites({this.positions, this.favoris});
+
+  @override
+  List<Object?> get props => [positions, favoris];
+}
+
 class User extends Equatable {
   final int id;
   final String email;
@@ -23,6 +34,11 @@ class User extends Equatable {
   final String? proJusquau;
   final Quota assistant;
 
+  /// Mot de passe provisoire (compte créé par l'administration) : à changer
+  /// avant d'utiliser l'app.
+  final bool doitChangerMotDePasse;
+  final Limites limites;
+
   const User({
     required this.id,
     required this.email,
@@ -32,6 +48,8 @@ class User extends Equatable {
     required this.plan,
     this.proJusquau,
     required this.assistant,
+    this.doitChangerMotDePasse = false,
+    this.limites = const Limites(),
   });
 
   bool get estPro => plan == 'pro';
@@ -43,5 +61,6 @@ class User extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, email, prenom, nom, telephone, plan, proJusquau, assistant];
+  List<Object?> get props =>
+      [id, email, prenom, nom, telephone, plan, proJusquau, assistant, doitChangerMotDePasse, limites];
 }

@@ -45,6 +45,7 @@ class Env {
 
   // ─── Marché ────────────────────────────────────────────────────────────
   static const String market = '/market';
+  static const String marketRefresh = '/market/refresh';
   // Mode démo (sans compte) : lecture seule, réglages par défaut.
   static const String demoMarket = '/demo/market';
   static String demoAnalyse(String symbol) => '/demo/structures/$symbol/analysis';

@@ -127,8 +127,8 @@ class _ProOfferState extends State<ProOffer> with WidgetsBindingObserver {
               style: sur(22, graisse: FontWeight.w700).copyWith(letterSpacing: -0.4, height: 1.2)),
           const SizedBox(height: 6),
           Text(
-            'Au lieu de ${widget.user.assistant.limite} avec l’offre gratuite. Paiement par Orange Money, Wave, MTN, Moov '
-            'ou carte via PayDunya.',
+            'Au lieu de ${widget.user.assistant.limite} avec l’offre gratuite, et portefeuille et favoris sans limite'
+            '${_limitesGratuites(widget.user.limites)}. Paiement par Orange Money, Wave, MTN, Moov ou carte via PayDunya.',
             style: sur(14, opacite: 0.7),
           ),
           const SizedBox(height: 18),
@@ -179,4 +179,13 @@ class _ProOfferState extends State<ProOffer> with WidgetsBindingObserver {
       ),
     );
   }
+}
+
+/// « (5 lignes et 5 favoris en gratuit) », vide si l'offre n'a pas de limite.
+String _limitesGratuites(Limites l) {
+  final parties = [
+    if (l.positions != null) '${l.positions} lignes',
+    if (l.favoris != null) '${l.favoris} favoris',
+  ];
+  return parties.isEmpty ? '' : ' (${parties.join(' et ')} en gratuit)';
 }
